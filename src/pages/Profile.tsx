@@ -155,10 +155,11 @@ export default function Profile() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Profile Card */}
           <div className="lg:col-span-1">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex flex-col items-center text-center">
-                  <Avatar className="w-24 h-24 mb-4">
+            <Card className="overflow-hidden">
+              <div className="h-20 bg-gradient-to-r from-primary to-accent" />
+              <CardContent className="pt-0">
+                <div className="flex flex-col items-center text-center -mt-12">
+                  <Avatar className="w-24 h-24 mb-4 border-4 border-background shadow-md">
                     <AvatarImage src={user?.image ?? undefined} />
                     <AvatarFallback className="text-2xl">
                       {user?.name?.[0] ?? 'U'}
