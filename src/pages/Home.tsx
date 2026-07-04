@@ -4,6 +4,7 @@ import { Search, ArrowRight, Star, Shield, Clock } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { CategoryCard } from '@/components/CategoryCard';
 import { ServiceCard } from '@/components/ServiceCard';
+import { FoundingTeam } from '@/components/FoundingTeam';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -187,6 +188,8 @@ export default function Home() {
           )}
         </div>
       </section>
+
+      <FoundingTeam />
 
       {/* CTA Section */}
       <section className="py-16 md:py-20 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
