@@ -349,8 +349,16 @@ export default function Home() {
       <FoundingTeam />
 
       {/* CTA Section */}
-      <section className="py-16 md:py-20 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
-        <div className="container mx-auto px-4 text-center">
+      <section className="relative overflow-hidden py-16 md:py-20 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-10"
+          style={{
+            backgroundImage:
+              'radial-gradient(circle, white 1.5px, transparent 1.5px)',
+            backgroundSize: '24px 24px',
+          }}
+        />
+        <div className="container mx-auto px-4 text-center relative">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
