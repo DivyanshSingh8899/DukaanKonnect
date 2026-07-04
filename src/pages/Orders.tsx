@@ -102,7 +102,7 @@ function OrderCard({ order, index }: { order: Order; index: number }) {
                 </div>
                 <Badge
                   variant="secondary"
-                  className={`${config.color} text-white`}
+                  className={`${config.color} text-white shadow-sm px-2.5 py-1`}
                 >
                   <StatusIcon className="w-3 h-3 mr-1" />
                   {config.label}
