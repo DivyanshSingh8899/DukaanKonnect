@@ -125,6 +125,35 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Stats Bar */}
+      <section className="border-y bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            {[
+              { value: '50,000+', label: 'Happy Customers' },
+              { value: '2,500+', label: 'Verified Professionals' },
+              { value: '12+', label: 'Cities Covered' },
+              { value: '4.8/5', label: 'Average Rating' },
+            ].map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.08, duration: 0.4 }}
+              >
+                <p className="text-2xl md:text-3xl font-bold text-primary mb-1">
+                  {stat.value}
+                </p>
+                <p className="text-xs md:text-sm text-muted-foreground">
+                  {stat.label}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Categories Section */}
       <section className="py-12 md:py-16 bg-muted/30">
         <div className="container mx-auto px-4">
