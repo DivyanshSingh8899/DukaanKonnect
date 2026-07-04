@@ -18,7 +18,9 @@ export default function Home() {
   const navigate = useNavigate();
 
   const categories = useQuery(api.categories.list);
-  const featuredServices = useQuery(api.services.listFeatured);
+  const allFeaturedServices = useQuery(api.services.listFeatured);
+  // Cap to a multiple of the grid's column count so the row is always full.
+  const featuredServices = allFeaturedServices?.slice(0, 4);
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
