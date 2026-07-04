@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, ArrowRight, Star, Shield, Clock } from 'lucide-react';
+import { Search, ArrowRight, Star, Shield, Clock, ClipboardList, CalendarCheck, Sparkles } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { CategoryCard } from '@/components/CategoryCard';
 import { ServiceCard } from '@/components/ServiceCard';
@@ -227,6 +227,56 @@ export default function Home() {
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-12 md:py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">
+              How It Works
+            </h2>
+            <p className="text-muted-foreground">
+              Book a trusted professional in three simple steps
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {[
+              {
+                icon: ClipboardList,
+                title: 'Choose a Service',
+                description: 'Browse categories and pick the service you need',
+              },
+              {
+                icon: CalendarCheck,
+                title: 'Book a Slot',
+                description: 'Select a date, time, and your preferred professional',
+              },
+              {
+                icon: Sparkles,
+                title: 'Get It Done',
+                description: 'A verified expert arrives and completes the job',
+              },
+            ].map((step, index) => (
+              <motion.div
+                key={step.title}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.4 }}
+                className="text-center"
+              >
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <step.icon className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="font-semibold text-lg mb-1">{step.title}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {step.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
