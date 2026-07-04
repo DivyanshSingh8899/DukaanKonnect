@@ -28,6 +28,7 @@ export function ServiceCard({ service, index = 0 }: ServiceCardProps) {
             alt={service.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
           {service.featured && (
             <Badge className="absolute top-3 left-3 bg-accent">
               Featured
