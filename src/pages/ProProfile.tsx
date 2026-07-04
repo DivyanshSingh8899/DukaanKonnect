@@ -130,10 +130,11 @@ export default function ProProfile() {
           <p className="text-muted-foreground">Your public profile and stats</p>
         </div>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex flex-col items-center text-center mb-6">
-              <Avatar className="w-24 h-24 mb-4">
+        <Card className="overflow-hidden">
+          <div className="h-16 bg-gradient-to-r from-primary to-accent" />
+          <CardContent className="pt-0">
+            <div className="flex flex-col items-center text-center mb-6 -mt-10">
+              <Avatar className="w-24 h-24 mb-4 border-4 border-background shadow-md">
                 <AvatarImage src={myProfile.avatar} />
                 <AvatarFallback className="text-2xl">{myProfile.name[0]}</AvatarFallback>
               </Avatar>
@@ -144,7 +145,7 @@ export default function ProProfile() {
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="text-center p-4 bg-muted/50 rounded-lg">
+              <div className="text-center p-4 bg-gradient-to-br from-primary/5 to-accent/5 rounded-lg border">
                 <div className="flex items-center justify-center gap-1 text-lg font-semibold">
                   <Star className="w-4 h-4 fill-primary text-primary" />
                   {myProfile.rating}
@@ -153,7 +154,7 @@ export default function ProProfile() {
                   {myProfile.reviewCount} reviews
                 </p>
               </div>
-              <div className="text-center p-4 bg-muted/50 rounded-lg">
+              <div className="text-center p-4 bg-gradient-to-br from-primary/5 to-accent/5 rounded-lg border">
                 <div className="flex items-center justify-center gap-1 text-lg font-semibold">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
                   {myProfile.completedJobs}
