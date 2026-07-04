@@ -13,6 +13,8 @@ export const create = mutation({
     time: v.string(),
     address: v.string(),
     notes: v.optional(v.string()),
+    paymentOrderId: v.optional(v.string()),
+    paymentId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -32,6 +34,9 @@ export const create = mutation({
       address: args.address,
       notes: args.notes,
       createdAt: new Date().toISOString(),
+      paymentOrderId: args.paymentOrderId,
+      paymentId: args.paymentId,
+      paymentStatus: args.paymentId ? "paid" : "unpaid",
     });
   },
 });

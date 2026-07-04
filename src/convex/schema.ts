@@ -104,6 +104,11 @@ const schema = defineSchema(
       address: v.string(),
       notes: v.optional(v.string()),
       createdAt: v.string(),
+      paymentOrderId: v.optional(v.string()),
+      paymentId: v.optional(v.string()),
+      paymentStatus: v.optional(
+        v.union(v.literal("paid"), v.literal("unpaid")),
+      ),
     })
       .index("by_user", ["userId"])
       .index("by_professional", ["professionalId"])

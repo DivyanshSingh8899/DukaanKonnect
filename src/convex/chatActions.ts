@@ -11,7 +11,7 @@ Help users understand how to use the app: finding and booking services, what hap
 
 export const sendMessage = action({
   args: { content: v.string() },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<void> => {
     const trimmed = args.content.trim();
     if (!trimmed) throw new Error("Message cannot be empty");
 
@@ -24,7 +24,12 @@ export const sendMessage = action({
       content: trimmed,
     });
 
-    const history = await ctx.runQuery(api.chat.listMine, {});
+    const history: {
+      id: string;
+      role: "user" | "assistant";
+      content: string;
+      createdAt: string;
+    }[] = await ctx.runQuery(api.chat.listMine, {});
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not configured");
