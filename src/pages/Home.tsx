@@ -37,7 +37,7 @@ export default function Home() {
     {
       icon: Star,
       title: 'Quality Service',
-      description: 'Rated 4.8 stars by 50,000+ customers',
+      description: 'Rated 4.8 stars by 50+ customers',
     },
     {
       icon: Clock,
@@ -132,8 +132,8 @@ export default function Home() {
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {[
-              { value: '50,000+', label: 'Happy Customers' },
-              { value: '2,500+', label: 'Verified Professionals' },
+              { value: '50+', label: 'Happy Customers' },
+              { value: '25+', label: 'Verified Professionals' },
               { value: '12+', label: 'Cities Covered' },
               { value: '4.8/5', label: 'Average Rating' },
             ].map((stat, index) => (
