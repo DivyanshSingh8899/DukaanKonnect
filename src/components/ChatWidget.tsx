@@ -125,13 +125,18 @@ export function ChatWidget() {
         )}
       </AnimatePresence>
 
-      <Button
-        size="icon"
-        className="h-14 w-14 rounded-full shadow-lg"
-        onClick={() => setOpen((v) => !v)}
+      <motion.div
+        animate={open ? {} : { scale: [1, 1.06, 1] }}
+        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
       >
-        {open ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
-      </Button>
+        <Button
+          size="icon"
+          className="h-14 w-14 rounded-full shadow-lg shadow-primary/30"
+          onClick={() => setOpen((v) => !v)}
+        >
+          {open ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
+        </Button>
+      </motion.div>
     </div>
   );
 }
