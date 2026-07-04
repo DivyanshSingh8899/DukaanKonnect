@@ -240,7 +240,7 @@ export default function Booking() {
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
                       step >= s.number
-                        ? 'bg-primary text-primary-foreground'
+                        ? 'bg-primary text-primary-foreground shadow-md shadow-primary/30 scale-110'
                         : 'bg-muted text-muted-foreground'
                     }`}
                   >
@@ -250,14 +250,18 @@ export default function Booking() {
                       <span className="font-semibold">{s.number}</span>
                     )}
                   </div>
-                  <span className="text-xs mt-2 hidden sm:block">
+                  <span
+                    className={`text-xs mt-2 hidden sm:block ${
+                      step >= s.number ? 'font-medium text-foreground' : 'text-muted-foreground'
+                    }`}
+                  >
                     {s.title}
                   </span>
                 </div>
                 {index < steps.length - 1 && (
                   <div
                     className={`flex-1 h-0.5 mx-2 transition-all ${
-                      step > s.number ? 'bg-primary' : 'bg-muted'
+                      step > s.number ? 'bg-gradient-to-r from-primary to-accent' : 'bg-muted'
                     }`}
                   />
                 )}
