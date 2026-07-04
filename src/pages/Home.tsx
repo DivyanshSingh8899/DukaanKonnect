@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, ArrowRight, Star, Shield, Clock, ClipboardList, CalendarCheck, Sparkles } from 'lucide-react';
+import { Search, ArrowRight, Star, Shield, Clock, ClipboardList, CalendarCheck, Sparkles, Quote } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { CategoryCard } from '@/components/CategoryCard';
 import { ServiceCard } from '@/components/ServiceCard';
@@ -274,6 +274,72 @@ export default function Home() {
                 <p className="text-sm text-muted-foreground">
                   {step.description}
                 </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-12 md:py-16 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">
+              What Our Customers Say
+            </h2>
+            <p className="text-muted-foreground">
+              Real feedback from real bookings
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                name: 'Anjali Mehta',
+                city: 'Mumbai',
+                text: 'Booked a deep cleaning and the professional was on time, polite, and thorough. Will definitely book again.',
+              },
+              {
+                name: 'Rohit Sharma',
+                city: 'Bangalore',
+                text: 'Fixed my AC within an hour of booking. Transparent pricing and no surprise charges.',
+              },
+              {
+                name: 'Priya Nair',
+                city: 'Pune',
+                text: 'Loved the salon-at-home experience. Easy booking, great service, highly recommend Dukaan Konnect.',
+              },
+            ].map((review, index) => (
+              <motion.div
+                key={review.name}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.4 }}
+              >
+                <Card className="h-full">
+                  <CardContent className="pt-6 px-6 pb-6">
+                    <Quote className="w-6 h-6 text-primary/40 mb-3" />
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {review.text}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-sm">{review.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {review.city}
+                        </p>
+                      </div>
+                      <div className="flex gap-0.5">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            className="w-3.5 h-3.5 fill-accent text-accent"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </motion.div>
             ))}
           </div>
