@@ -1,0 +1,17 @@
+{
+  "name": "Dukaan Konnect",
+  "short_name": "Dukaan Konnect",
+  "description": "Book trusted home service professionals at your doorstep.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
