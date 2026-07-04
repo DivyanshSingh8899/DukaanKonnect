@@ -48,7 +48,19 @@ export default function Home() {
     <Layout>
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-background">
-        <div className="container mx-auto px-4 py-16 md:py-24">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <motion.div
+            animate={{ scale: [1, 1.15, 1], opacity: [0.25, 0.4, 0.25] }}
+            transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary/20 blur-3xl"
+          />
+          <motion.div
+            animate={{ scale: [1.15, 1, 1.15], opacity: [0.2, 0.35, 0.2] }}
+            transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute -bottom-32 -right-16 w-[28rem] h-[28rem] rounded-full bg-accent/20 blur-3xl"
+          />
+        </div>
+        <div className="container mx-auto px-4 py-16 md:py-24 relative">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
