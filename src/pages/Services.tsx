@@ -25,13 +25,13 @@ import {
 import { Slider } from '@/components/ui/slider';
 import { SkeletonGrid } from '@/components/SkeletonCard';
 import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { servicesListRef, categoriesListRef } from '@/lib/convexRefs';
 import { useSearchParams } from 'react-router';
 
 export default function Services() {
   const [searchParams] = useSearchParams();
-  const services = useQuery(api.services.list);
-  const categories = useQuery(api.categories.list);
+  const services = useQuery(servicesListRef, {});
+  const categories = useQuery(categoriesListRef, {});
   const [searchQuery, setSearchQuery] = useState(
     searchParams.get('search') || ''
   );

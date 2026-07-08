@@ -34,7 +34,7 @@ import {
 } from '@/components/ui/dialog';
 import { useAuth } from '@/hooks/use-auth';
 import { useQuery, useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { addressesListMineRef, updateProfileRef, addAddressRef } from '@/lib/convexRefs';
 import { ROLES } from '@/convex/schema';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -42,9 +42,9 @@ import { toast } from 'sonner';
 export default function Profile() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const addresses = useQuery(api.addresses.listMine);
-  const updateProfile = useMutation(api.users.updateProfile);
-  const addAddress = useMutation(api.addresses.add);
+  const addresses = useQuery(addressesListMineRef, {});
+  const updateProfile = useMutation(updateProfileRef);
+  const addAddress = useMutation(addAddressRef);
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({

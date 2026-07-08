@@ -2,8 +2,23 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { v } from "convex/values";
+import { makeFunctionReference } from "convex/server";
 import { action } from "./_generated/server";
-import { api, internal } from "./_generated/api";
+import type { Doc, Id } from "./_generated/dataModel";
+
+const currentUserRef = makeFunctionReference<"query", Record<string, never>, Doc<"users"> | null>(
+  "users:currentUser",
+);
+const listMineRef = makeFunctionReference<
+  "query",
+  Record<string, never>,
+  { id: string; role: "user" | "assistant"; content: string; createdAt: string }[]
+>("chat:listMine");
+const insertMessageRef = makeFunctionReference<
+  "mutation",
+  { userId: Id<"users">; role: "user" | "assistant"; content: string },
+  void
+>("chat:insertMessage");
 
 const SYSTEM_PROMPT = `You are the customer support assistant for Dukaan Konnect, a home services booking platform. Customers can browse categories (cleaning, plumbing, electrical, salon & spa, carpentry, painting, appliance repair, pest control), book a professional for a service, track bookings on their Orders page, and manage saved addresses in their Profile. Professionals can register from their Profile page ("Become a Service Professional") and manage job requests from their dashboard.
 
@@ -15,21 +30,16 @@ export const sendMessage = action({
     const trimmed = args.content.trim();
     if (!trimmed) throw new Error("Message cannot be empty");
 
-    const user = await ctx.runQuery(api.users.currentUser);
+    const user = await ctx.runQuery(currentUserRef, {});
     if (!user) throw new Error("Not authenticated");
 
-    await ctx.runMutation(internal.chat.insertMessage, {
+    await ctx.runMutation(insertMessageRef, {
       userId: user._id,
       role: "user",
       content: trimmed,
     });
 
-    const history: {
-      id: string;
-      role: "user" | "assistant";
-      content: string;
-      createdAt: string;
-    }[] = await ctx.runQuery(api.chat.listMine, {});
+    const history = await ctx.runQuery(listMineRef, {});
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) throw new Error("ANTHROPIC_API_KEY is not configured");
@@ -62,7 +72,7 @@ export const sendMessage = action({
       console.error("Anthropic API error:", error);
     }
 
-    await ctx.runMutation(internal.chat.insertMessage, {
+    await ctx.runMutation(insertMessageRef, {
       userId: user._id,
       role: "assistant",
       content: reply,

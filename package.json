@@ -47,7 +47,6 @@
     "@tailwindcss/vite": "^4.1.17",
     "@anthropic-ai/sdk": "^0.68.0",
     "@types/three": "^0.181.0",
-    "axios": "^1.13.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -60,6 +59,7 @@
     "input-otp": "^1.4.2",
     "lucide-react": "^0.555.0",
     "next-themes": "^0.4.6",
+    "nodemailer": "^6.9.16",
     "react": "^19.2.0",
     "react-day-picker": "9.11.3",
     "react-dom": "^19.2.0",
@@ -79,6 +79,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.1",
+    "@types/nodemailer": "^6.4.17",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",

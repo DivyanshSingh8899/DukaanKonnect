@@ -10,15 +10,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { SkeletonGrid } from '@/components/SkeletonCard';
 import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { categoriesListRef, servicesListFeaturedRef } from '@/lib/convexRefs';
 import { useNavigate } from 'react-router';
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
-  const categories = useQuery(api.categories.list);
-  const allFeaturedServices = useQuery(api.services.listFeatured);
+  const categories = useQuery(categoriesListRef, {});
+  const allFeaturedServices = useQuery(servicesListFeaturedRef, {});
   // Cap to a multiple of the grid's column count so the row is always full.
   const featuredServices = allFeaturedServices?.slice(0, 4);
 

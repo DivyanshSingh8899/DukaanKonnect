@@ -21,7 +21,7 @@ import { OrderStatus, Order } from '@/types';
 import { useNavigate } from 'react-router';
 import { format } from 'date-fns';
 import { useQuery, useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { bookingsListMineRef, bookingsUpdateStatusRef } from '@/lib/convexRefs';
 import type { Id } from '@/convex/_generated/dataModel';
 import { toast } from 'sonner';
 
@@ -58,7 +58,7 @@ const statusConfig: Record<
 
 function OrderCard({ order, index }: { order: Order; index: number }) {
   const navigate = useNavigate();
-  const updateStatus = useMutation(api.bookings.updateStatus);
+  const updateStatus = useMutation(bookingsUpdateStatusRef);
   const config = statusConfig[order.status];
   const StatusIcon = config.icon;
 
@@ -196,7 +196,7 @@ export default function Orders() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('all');
 
-  const orders = useQuery(api.bookings.listMine, {});
+  const orders = useQuery(bookingsListMineRef, {});
 
   const filterOrders = (status?: OrderStatus) => {
     if (!orders) return [];

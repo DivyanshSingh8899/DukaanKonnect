@@ -15,17 +15,19 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery, useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import {
+  bookingsUpdateStatusRef,
+  professionalsMyProfileRef,
+  bookingsListForProfessionalRef,
+  type ProBooking,
+} from '@/lib/convexRefs';
 import type { Id } from '@/convex/_generated/dataModel';
-import type { FunctionReturnType } from 'convex/server';
 import { Navigate } from 'react-router';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
-type ProBooking = FunctionReturnType<typeof api.bookings.listForProfessional>[number];
-
 function ProBookingCard({ booking, index }: { booking: ProBooking; index: number }) {
-  const updateStatus = useMutation(api.bookings.updateStatus);
+  const updateStatus = useMutation(bookingsUpdateStatusRef);
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleUpdate = async (status: 'confirmed' | 'cancelled' | 'in_progress' | 'completed') => {
@@ -130,8 +132,8 @@ function ProBookingCard({ booking, index }: { booking: ProBooking; index: number
 
 export default function ProDashboard() {
   const [activeTab, setActiveTab] = useState('new');
-  const myProfile = useQuery(api.professionals.myProfile);
-  const bookings = useQuery(api.bookings.listForProfessional, {});
+  const myProfile = useQuery(professionalsMyProfileRef, {});
+  const bookings = useQuery(bookingsListForProfessionalRef, {});
 
   if (myProfile === undefined || bookings === undefined) {
     return (

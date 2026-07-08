@@ -20,7 +20,14 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { useBookingStore } from '@/store/useBookingStore';
 import { useQuery, useAction } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import {
+  currentUserRef,
+  paymentsCreateOrderRef,
+  paymentsVerifyAndBookRef,
+  serviceGetByIdRef,
+  bookingsGetBookedSlotsRef,
+  professionalsListBySpecialtyRef,
+} from '@/lib/convexRefs';
 import type { Id } from '@/convex/_generated/dataModel';
 import type { Professional, TimeSlot } from '@/types';
 import { useNavigate, useSearchParams } from 'react-router';
@@ -70,13 +77,13 @@ export default function Booking() {
     resetBooking,
   } = useBookingStore();
 
-  const currentUser = useQuery(api.users.currentUser);
-  const createOrder = useAction(api.paymentActions.createOrder);
-  const verifyAndBook = useAction(api.paymentActions.verifyAndBook);
+  const currentUser = useQuery(currentUserRef, {});
+  const createOrder = useAction(paymentsCreateOrderRef);
+  const verifyAndBook = useAction(paymentsVerifyAndBookRef);
 
   const serviceIdParam = searchParams.get('service');
   const fetchedService = useQuery(
-    api.services.getById,
+    serviceGetByIdRef,
     serviceIdParam && !service ? { id: serviceIdParam as Id<'services'> } : 'skip'
   );
 
@@ -99,7 +106,7 @@ export default function Booking() {
 
   const bookedSlots =
     useQuery(
-      api.bookings.getBookedSlots,
+      bookingsGetBookedSlotsRef,
       service && date
         ? { categorySlug: service.categorySlug, date: format(date, 'yyyy-MM-dd') }
         : 'skip'
@@ -113,7 +120,7 @@ export default function Booking() {
 
   const matchingProfessionals =
     useQuery(
-      api.professionals.listBySpecialty,
+      professionalsListBySpecialtyRef,
       service ? { categorySlug: service.categorySlug } : 'skip'
     ) ?? [];
 

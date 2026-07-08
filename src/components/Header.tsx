@@ -17,7 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
 import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { bookingsListMineRef } from '@/lib/convexRefs';
 import { ROLES } from '@/convex/schema';
 import { useTheme } from 'next-themes';
 
@@ -36,7 +36,7 @@ export function Header() {
   const isProfessional = user?.role === ROLES.PROFESSIONAL;
 
   const pendingCount = useQuery(
-    api.bookings.listMine,
+    bookingsListMineRef,
     isAuthenticated && !isProfessional ? { status: 'pending' } : 'skip'
   )?.length ?? 0;
 

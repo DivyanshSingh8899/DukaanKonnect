@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/use-auth';
 import { useQuery, useAction } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { chatListMineRef, chatSendMessageRef } from '@/lib/convexRefs';
 import { toast } from 'sonner';
 
 export function ChatWidget() {
@@ -15,8 +15,8 @@ export function ChatWidget() {
   const [isSending, setIsSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const messages = useQuery(api.chat.listMine, isAuthenticated ? {} : 'skip');
-  const sendMessage = useAction(api.chatActions.sendMessage);
+  const messages = useQuery(chatListMineRef, isAuthenticated ? {} : 'skip');
+  const sendMessage = useAction(chatSendMessageRef);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });

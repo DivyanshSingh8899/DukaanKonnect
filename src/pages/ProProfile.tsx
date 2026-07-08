@@ -9,14 +9,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/use-auth';
 import { useQuery, useMutation } from 'convex/react';
-import { api } from '@/convex/_generated/api';
+import { categoriesListRef, registerAsProfessionalRef, professionalsMyProfileRef } from '@/lib/convexRefs';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
 function BecomeProfessional() {
   const navigate = useNavigate();
-  const categories = useQuery(api.categories.list);
-  const registerAsProfessional = useMutation(api.professionals.registerAsProfessional);
+  const categories = useQuery(categoriesListRef, {});
+  const registerAsProfessional = useMutation(registerAsProfessionalRef);
   const [selected, setSelected] = useState<string[]>([]);
   const [bio, setBio] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -97,7 +97,7 @@ function BecomeProfessional() {
 export default function ProProfile() {
   const navigate = useNavigate();
   const { signOut } = useAuth();
-  const myProfile = useQuery(api.professionals.myProfile);
+  const myProfile = useQuery(professionalsMyProfileRef, {});
 
   const handleLogout = async () => {
     try {

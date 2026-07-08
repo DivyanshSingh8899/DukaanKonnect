@@ -2,9 +2,10 @@
 
 import crypto from "node:crypto";
 import { v } from "convex/values";
+import { makeFunctionReference } from "convex/server";
 import { action } from "./_generated/server";
-import { api } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
+import type { toService } from "./services";
 
 interface RazorpayOrder {
   orderId: string;
@@ -12,6 +13,27 @@ interface RazorpayOrder {
   currency: string;
   keyId: string;
 }
+
+const getServiceByIdRef = makeFunctionReference<
+  "query",
+  { id: Id<"services"> },
+  ReturnType<typeof toService> | null
+>("services:getById");
+
+const createBookingRef = makeFunctionReference<
+  "mutation",
+  {
+    serviceId: Id<"services">;
+    professionalId?: Id<"professionals">;
+    date: string;
+    time: string;
+    address: string;
+    notes?: string;
+    paymentOrderId?: string;
+    paymentId?: string;
+  },
+  Id<"bookings">
+>("bookings:create");
 
 function getRazorpayCredentials() {
   const keyId = process.env.RAZORPAY_KEY_ID;
@@ -25,7 +47,7 @@ function getRazorpayCredentials() {
 export const createOrder = action({
   args: { serviceId: v.id("services") },
   handler: async (ctx, args): Promise<RazorpayOrder> => {
-    const service = await ctx.runQuery(api.services.getById, {
+    const service = await ctx.runQuery(getServiceByIdRef, {
       id: args.serviceId,
     });
     if (!service) throw new Error("Service not found");
@@ -91,7 +113,7 @@ export const verifyAndBook = action({
       throw new Error("Payment verification failed");
     }
 
-    return await ctx.runMutation(api.bookings.create, {
+    return await ctx.runMutation(createBookingRef, {
       serviceId: args.serviceId,
       professionalId: args.professionalId,
       date: args.date,
