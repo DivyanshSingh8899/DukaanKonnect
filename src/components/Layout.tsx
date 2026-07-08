@@ -83,8 +83,8 @@ export function Layout({ children }: LayoutProps) {
             <div>
               <h3 className="font-semibold mb-3">Contact</h3>
               <ul className="text-sm text-muted-foreground space-y-2">
-                <li>Email: support@dukaankonnect.com</li>
-                <li>Phone: +91 1800 000 0000</li>
+                <li>Email: support.dukaankonnect@gmail.com</li>
+                <li>Phone: +91 9115224050</li>
                 <li>Available 24/7</li>
               </ul>
             </div>
