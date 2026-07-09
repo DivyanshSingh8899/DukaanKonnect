@@ -13,13 +13,25 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { useAuth } from "@/hooks/use-auth";
 import { updateProfileRef } from "@/lib/convexRefs";
 import { useMutation } from "convex/react";
 import { ROLES } from "@/convex/schema";
-import { ArrowRight, Briefcase, Loader2, Mail, User, UserX } from "lucide-react";
+import {
+  ArrowRight,
+  Briefcase,
+  Droplet,
+  Loader2,
+  Mail,
+  ShieldCheck,
+  Sparkles,
+  User,
+  UserX,
+  Wrench,
+  Zap,
+} from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Suspense, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 
@@ -115,203 +127,316 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
     }
   };
 
-  return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-primary/5 via-accent/5 to-background">
+  const floatingIcons = [
+    { Icon: Wrench, className: "top-[12%] left-[10%]", delay: 0 },
+    { Icon: Sparkles, className: "top-[20%] right-[12%]", delay: 1.2 },
+    { Icon: Zap, className: "bottom-[18%] left-[14%]", delay: 2.4 },
+    { Icon: Droplet, className: "bottom-[24%] right-[9%]", delay: 0.8 },
+  ];
 
+  return (
+    <div className="relative min-h-screen flex flex-col overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-background">
+      {/* Animated decorative background */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <motion.div
+          animate={{ scale: [1, 1.15, 1], opacity: [0.25, 0.4, 0.25] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary/20 blur-3xl"
+        />
+        <motion.div
+          animate={{ scale: [1.15, 1, 1.15], opacity: [0.2, 0.35, 0.2] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -bottom-32 -right-16 w-[28rem] h-[28rem] rounded-full bg-accent/20 blur-3xl"
+        />
+        {floatingIcons.map(({ Icon, className, delay }, i) => (
+          <motion.div
+            key={i}
+            className={`absolute hidden sm:block ${className}`}
+            initial={{ opacity: 0, y: 0 }}
+            animate={{ opacity: [0, 0.25, 0], y: [-10, 10, -10] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay }}
+          >
+            <Icon className="w-10 h-10 text-primary" />
+          </motion.div>
+        ))}
+      </div>
 
       {/* Auth Content */}
-      <div className="flex-1 flex items-center justify-center">
-        <div className="flex items-center justify-center h-full flex-col">
-        <Card className="min-w-[350px] pb-0 border shadow-xl">
-          {step === "signIn" ? (
-            <>
-              <CardHeader className="text-center">
-              <div className="flex justify-center">
-                    <img
-                      src="./logo.svg"
-                      alt="Lock Icon"
-                      width={64}
-                      height={64}
-                      className="rounded-lg mb-4 mt-4 cursor-pointer"
-                      onClick={() => navigate("/")}
-                    />
-                  </div>
-                <CardTitle className="text-xl">Get Started</CardTitle>
-                <CardDescription>
-                  {loginMode === "provider"
-                    ? "Sign up to offer your services and receive job requests"
-                    : "Enter your email to log in or sign up"}
-                </CardDescription>
-              </CardHeader>
-              <div className="px-6">
-                <Tabs value={loginMode} onValueChange={(v) => setLoginMode(v as "customer" | "provider")}>
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="customer">
-                      <User className="w-4 h-4 mr-1.5" />
-                      Customer
-                    </TabsTrigger>
-                    <TabsTrigger value="provider">
-                      <Briefcase className="w-4 h-4 mr-1.5" />
-                      Service Provider
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
-              <form onSubmit={handleEmailSubmit}>
-                <CardContent>
-                  <div className="relative mb-3">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      name="name"
-                      placeholder="Your full name"
-                      type="text"
-                      className="pl-9"
-                      disabled={isLoading}
-                      required
-                    />
-                  </div>
-                  <div className="relative flex items-center gap-2">
-                    <div className="relative flex-1">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        name="email"
-                        placeholder="name@example.com"
-                        type="email"
-                        className="pl-9"
-                        disabled={isLoading}
-                        required
-                      />
-                    </div>
-                    <Button
-                      type="submit"
-                      variant="outline"
-                      size="icon"
-                      disabled={isLoading}
+      <div className="relative flex-1 flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 24, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          className="flex items-center justify-center flex-col"
+        >
+          <Card className="min-w-[350px] pb-0 border shadow-2xl shadow-primary/10 backdrop-blur-sm bg-card/95">
+            <AnimatePresence mode="wait">
+              {step === "signIn" ? (
+                <motion.div
+                  key="signin"
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -16 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <CardHeader className="text-center">
+                    <motion.div
+                      className="flex justify-center"
+                      whileHover={{ scale: 1.08, rotate: -3 }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      {isLoading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <ArrowRight className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                  {error && (
-                    <p className="mt-2 text-sm text-red-500">{error}</p>
-                  )}
-                  
-                  {loginMode === "customer" && (
-                    <div className="mt-4">
-                      <div className="relative">
-                        <div className="absolute inset-0 flex items-center">
-                          <span className="w-full border-t" />
-                        </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                          <span className="bg-background px-2 text-muted-foreground">
-                            Or
-                          </span>
-                        </div>
-                      </div>
+                      <img
+                        src="./logo.svg"
+                        alt="Lock Icon"
+                        width={64}
+                        height={64}
+                        className="rounded-lg mb-4 mt-4 cursor-pointer shadow-lg shadow-primary/20"
+                        onClick={() => navigate("/")}
+                      />
+                    </motion.div>
+                    <CardTitle className="text-xl">Get Started</CardTitle>
+                    <CardDescription>
+                      <AnimatePresence mode="wait">
+                        <motion.span
+                          key={loginMode}
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 4 }}
+                          transition={{ duration: 0.2 }}
+                          className="block"
+                        >
+                          {loginMode === "provider"
+                            ? "Sign up to offer your services and receive job requests"
+                            : "Enter your email to log in or sign up"}
+                        </motion.span>
+                      </AnimatePresence>
+                    </CardDescription>
+                  </CardHeader>
 
+                  <div className="px-6">
+                    <div className="relative grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
+                      <motion.div
+                        className="absolute inset-y-1 w-[calc(50%-4px)] rounded-md bg-background shadow-sm"
+                        animate={{ x: loginMode === "customer" ? "0%" : "calc(100% + 8px)" }}
+                        transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setLoginMode("customer")}
+                        className={`relative z-10 flex items-center justify-center gap-1.5 rounded-md py-1.5 text-sm font-medium transition-colors ${
+                          loginMode === "customer" ? "text-foreground" : "text-muted-foreground"
+                        }`}
+                      >
+                        <User className="w-4 h-4" />
+                        Customer
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setLoginMode("provider")}
+                        className={`relative z-10 flex items-center justify-center gap-1.5 rounded-md py-1.5 text-sm font-medium transition-colors ${
+                          loginMode === "provider" ? "text-foreground" : "text-muted-foreground"
+                        }`}
+                      >
+                        <Briefcase className="w-4 h-4" />
+                        Service Provider
+                      </button>
+                    </div>
+                  </div>
+
+                  <form onSubmit={handleEmailSubmit}>
+                    <CardContent>
+                      <div className="relative mb-3">
+                        <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          name="name"
+                          placeholder="Your full name"
+                          type="text"
+                          className="pl-9 transition-shadow focus-visible:shadow-md focus-visible:shadow-primary/10"
+                          disabled={isLoading}
+                          required
+                        />
+                      </div>
+                      <div className="relative flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            name="email"
+                            placeholder="name@example.com"
+                            type="email"
+                            className="pl-9 transition-shadow focus-visible:shadow-md focus-visible:shadow-primary/10"
+                            disabled={isLoading}
+                            required
+                          />
+                        </div>
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.92 }}>
+                          <Button type="submit" variant="outline" size="icon" disabled={isLoading}>
+                            {isLoading ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <ArrowRight className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </motion.div>
+                      </div>
+                      {error && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-2 text-sm text-red-500"
+                        >
+                          {error}
+                        </motion.p>
+                      )}
+
+                      <AnimatePresence>
+                        {loginMode === "customer" && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="mt-4 overflow-hidden"
+                          >
+                            <div className="relative">
+                              <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t" />
+                              </div>
+                              <div className="relative flex justify-center text-xs uppercase">
+                                <span className="bg-background px-2 text-muted-foreground">
+                                  Or
+                                </span>
+                              </div>
+                            </div>
+
+                            <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className="w-full mt-4"
+                                onClick={handleGuestLogin}
+                                disabled={isLoading}
+                              >
+                                <UserX className="mr-2 h-4 w-4" />
+                                Continue as Guest
+                              </Button>
+                            </motion.div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </CardContent>
+                  </form>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="otp"
+                  initial={{ opacity: 0, x: 16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 16 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <CardHeader className="text-center mt-4">
+                    <motion.div
+                      initial={{ scale: 0, rotate: -20 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 18 }}
+                      className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10"
+                    >
+                      <ShieldCheck className="h-6 w-6 text-primary" />
+                    </motion.div>
+                    <CardTitle>Check your email</CardTitle>
+                    <CardDescription>
+                      We've sent a code to {step.email}
+                    </CardDescription>
+                  </CardHeader>
+                  <form onSubmit={handleOtpSubmit}>
+                    <CardContent className="pb-4">
+                      <input type="hidden" name="email" value={step.email} />
+                      <input type="hidden" name="code" value={otp} />
+
+                      <motion.div
+                        className="flex justify-center"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                      >
+                        <InputOTP
+                          value={otp}
+                          onChange={setOtp}
+                          maxLength={6}
+                          disabled={isLoading}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && otp.length === 6 && !isLoading) {
+                              // Find the closest form and submit it
+                              const form = (e.target as HTMLElement).closest("form");
+                              if (form) {
+                                form.requestSubmit();
+                              }
+                            }
+                          }}
+                        >
+                          <InputOTPGroup>
+                            {Array.from({ length: 6 }).map((_, index) => (
+                              <InputOTPSlot key={index} index={index} />
+                            ))}
+                          </InputOTPGroup>
+                        </InputOTP>
+                      </motion.div>
+                      {error && (
+                        <motion.p
+                          initial={{ opacity: 0, y: -4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-2 text-sm text-red-500 text-center"
+                        >
+                          {error}
+                        </motion.p>
+                      )}
+                      <p className="text-sm text-muted-foreground text-center mt-4">
+                        Didn't receive a code?{" "}
+                        <Button
+                          variant="link"
+                          className="p-0 h-auto"
+                          onClick={() => setStep("signIn")}
+                        >
+                          Try again
+                        </Button>
+                      </p>
+                    </CardContent>
+                    <CardFooter className="flex-col gap-2">
+                      <motion.div className="w-full" whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}>
+                        <Button
+                          type="submit"
+                          className="w-full"
+                          disabled={isLoading || otp.length !== 6}
+                        >
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Verifying...
+                            </>
+                          ) : (
+                            <>
+                              Verify code
+                              <ArrowRight className="ml-2 h-4 w-4" />
+                            </>
+                          )}
+                        </Button>
+                      </motion.div>
                       <Button
                         type="button"
-                        variant="outline"
-                        className="w-full mt-4"
-                        onClick={handleGuestLogin}
+                        variant="ghost"
+                        onClick={() => setStep("signIn")}
                         disabled={isLoading}
+                        className="w-full"
                       >
-                        <UserX className="mr-2 h-4 w-4" />
-                        Continue as Guest
+                        Use different email
                       </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </form>
-            </>
-          ) : (
-            <>
-              <CardHeader className="text-center mt-4">
-                <CardTitle>Check your email</CardTitle>
-                <CardDescription>
-                  We've sent a code to {step.email}
-                </CardDescription>
-              </CardHeader>
-              <form onSubmit={handleOtpSubmit}>
-                <CardContent className="pb-4">
-                  <input type="hidden" name="email" value={step.email} />
-                  <input type="hidden" name="code" value={otp} />
-
-                  <div className="flex justify-center">
-                    <InputOTP
-                      value={otp}
-                      onChange={setOtp}
-                      maxLength={6}
-                      disabled={isLoading}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && otp.length === 6 && !isLoading) {
-                          // Find the closest form and submit it
-                          const form = (e.target as HTMLElement).closest("form");
-                          if (form) {
-                            form.requestSubmit();
-                          }
-                        }
-                      }}
-                    >
-                      <InputOTPGroup>
-                        {Array.from({ length: 6 }).map((_, index) => (
-                          <InputOTPSlot key={index} index={index} />
-                        ))}
-                      </InputOTPGroup>
-                    </InputOTP>
-                  </div>
-                  {error && (
-                    <p className="mt-2 text-sm text-red-500 text-center">
-                      {error}
-                    </p>
-                  )}
-                  <p className="text-sm text-muted-foreground text-center mt-4">
-                    Didn't receive a code?{" "}
-                    <Button
-                      variant="link"
-                      className="p-0 h-auto"
-                      onClick={() => setStep("signIn")}
-                    >
-                      Try again
-                    </Button>
-                  </p>
-                </CardContent>
-                <CardFooter className="flex-col gap-2">
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={isLoading || otp.length !== 6}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Verifying...
-                      </>
-                    ) : (
-                      <>
-                        Verify code
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => setStep("signIn")}
-                    disabled={isLoading}
-                    className="w-full"
-                  >
-                    Use different email
-                  </Button>
-                </CardFooter>
-              </form>
-            </>
-          )}
-        </Card>
-        </div>
+                    </CardFooter>
+                  </form>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Card>
+        </motion.div>
       </div>
     </div>
   );
