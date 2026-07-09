@@ -109,7 +109,7 @@ export const professionalsMyProfileRef = makeFunctionReference<
 
 export const registerAsProfessionalRef = makeFunctionReference<
   "mutation",
-  { specialties: string[]; bio?: string },
+  { specialties: string[]; bio?: string; experienceYears: number },
   Id<"professionals">
 >("professionals:registerAsProfessional");
 
@@ -267,6 +267,12 @@ export const adminSetProfessionalApprovalRef = makeFunctionReference<
   { professionalId: Id<"professionals">; approved: boolean },
   void
 >("admin:setProfessionalApproval");
+
+export const adminAssignProfessionalRef = makeFunctionReference<
+  "mutation",
+  { bookingId: Id<"bookings">; professionalId?: Id<"professionals"> },
+  void
+>("admin:assignProfessional");
 
 export const adminListAllBookingsRef = makeFunctionReference<
   "query",

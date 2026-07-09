@@ -58,6 +58,29 @@ export const setProfessionalApproval = mutation({
   },
 });
 
+export const assignProfessional = mutation({
+  args: {
+    bookingId: v.id("bookings"),
+    professionalId: v.optional(v.id("professionals")),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const booking = await ctx.db.get(args.bookingId);
+    if (!booking) throw new Error("Booking not found");
+
+    if (args.professionalId) {
+      const professional = await ctx.db.get(args.professionalId);
+      if (!professional) throw new Error("Professional not found");
+      if (!(professional.approved ?? false)) {
+        throw new Error("Cannot assign an unapproved professional");
+      }
+    }
+
+    await ctx.db.patch(args.bookingId, { professionalId: args.professionalId });
+  },
+});
+
 export const listAllBookings = query({
   args: { status: v.optional(orderStatusValidator) },
   handler: async (ctx, args) => {

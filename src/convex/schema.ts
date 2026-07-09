@@ -82,6 +82,7 @@ const schema = defineSchema(
       specialties: v.array(v.string()),
       bio: v.optional(v.string()),
       approved: v.optional(v.boolean()),
+      experienceYears: v.optional(v.number()),
     }).index("by_user", ["userId"]),
 
     addresses: defineTable({

@@ -48,6 +48,7 @@ import {
   adminListProfessionalsRef,
   adminSetProfessionalApprovalRef,
   adminListAllBookingsRef,
+  adminAssignProfessionalRef,
   categoriesListRef,
   categoriesCreateRef,
   categoriesRemoveRef,
@@ -192,6 +193,20 @@ function ProfessionalsTab() {
 
 function BookingsTab() {
   const bookings = useQuery(adminListAllBookingsRef, {});
+  const approvedProfessionals = useQuery(adminListProfessionalsRef, { approved: true });
+  const assignProfessional = useMutation(adminAssignProfessionalRef);
+
+  const handleAssign = async (bookingId: string, professionalId: string) => {
+    try {
+      await assignProfessional({
+        bookingId: bookingId as Id<'bookings'>,
+        professionalId: professionalId === 'unassign' ? undefined : (professionalId as Id<'professionals'>),
+      });
+      toast.success('Professional assigned');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to assign professional');
+    }
+  };
 
   if (bookings === undefined) {
     return <p className="text-muted-foreground text-center py-12">Loading...</p>;
@@ -214,25 +229,51 @@ function BookingsTab() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {bookings.map((b) => (
-          <TableRow key={b.id}>
-            <TableCell className="font-medium">{b.service.name}</TableCell>
-            <TableCell>
-              <div>{b.customerName}</div>
-              <div className="text-xs text-muted-foreground">{b.customerEmail}</div>
-            </TableCell>
-            <TableCell>{b.professional?.name ?? '—'}</TableCell>
-            <TableCell>
-              {format(new Date(b.date), 'PP')} · {b.time}
-            </TableCell>
-            <TableCell>
-              <Badge variant="secondary" className="capitalize">
-                {b.status.replace('_', ' ')}
-              </Badge>
-            </TableCell>
-            <TableCell className="text-right">₹{b.totalAmount}</TableCell>
-          </TableRow>
-        ))}
+        {bookings.map((b) => {
+          const matchingProfessionals = (approvedProfessionals ?? []).filter((p) =>
+            p.specialties.includes(b.service.categorySlug),
+          );
+          return (
+            <TableRow key={b.id}>
+              <TableCell className="font-medium">{b.service.name}</TableCell>
+              <TableCell>
+                <div>{b.customerName}</div>
+                <div className="text-xs text-muted-foreground">{b.customerEmail}</div>
+              </TableCell>
+              <TableCell>
+                {b.status === 'pending' || b.status === 'confirmed' ? (
+                  <Select
+                    value={b.professional?.id ?? 'unassign'}
+                    onValueChange={(v) => handleAssign(b.id, v)}
+                  >
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="Unassigned" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="unassign">Unassigned</SelectItem>
+                      {matchingProfessionals.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>
+                          {p.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  b.professional?.name ?? '—'
+                )}
+              </TableCell>
+              <TableCell>
+                {format(new Date(b.date), 'PP')} · {b.time}
+              </TableCell>
+              <TableCell>
+                <Badge variant="secondary" className="capitalize">
+                  {b.status.replace('_', ' ')}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-right">₹{b.totalAmount}</TableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );

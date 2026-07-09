@@ -34,6 +34,7 @@ export interface Professional {
   specialties: string[];
   bio?: string;
   approved?: boolean;
+  experienceYears?: number;
 }
 
 export interface TimeSlot {

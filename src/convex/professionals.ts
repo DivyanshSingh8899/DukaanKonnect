@@ -15,6 +15,7 @@ export function toProfessional(p: Doc<"professionals">) {
     specialties: p.specialties,
     bio: p.bio,
     approved: p.approved ?? false,
+    experienceYears: p.experienceYears ?? 0,
   };
 }
 
@@ -45,6 +46,7 @@ export const registerAsProfessional = mutation({
   args: {
     specialties: v.array(v.string()),
     bio: v.optional(v.string()),
+    experienceYears: v.number(),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -70,6 +72,7 @@ export const registerAsProfessional = mutation({
       completedJobs: 0,
       specialties: args.specialties,
       bio: args.bio,
+      experienceYears: args.experienceYears,
       approved: false,
     });
 

@@ -135,25 +135,9 @@ export const listForProfessional = query({
       )
       .collect();
 
-    const candidates = assigned;
-
-    if ((myProfessional.approved ?? false) && (!args.status || args.status === "pending")) {
-      const pending = await ctx.db
-        .query("bookings")
-        .withIndex("by_status", (q) => q.eq("status", "pending"))
-        .collect();
-      for (const b of pending) {
-        if (b.professionalId) continue;
-        const service = await ctx.db.get(b.serviceId);
-        if (service && myProfessional.specialties.includes(service.categorySlug)) {
-          candidates.push(b);
-        }
-      }
-    }
-
     const filtered = args.status
-      ? candidates.filter((b) => b.status === args.status)
-      : candidates;
+      ? assigned.filter((b) => b.status === args.status)
+      : assigned;
 
     const resolved = (
       await Promise.all(
@@ -214,30 +198,12 @@ export const updateStatus = mutation({
     if (!myProfessional) throw new Error("Not authorized");
 
     const isMine = booking.professionalId === myProfessional._id;
+    if (!isMine) throw new Error("Not authorized");
 
-    if (
-      args.status === "confirmed" &&
-      booking.status === "pending" &&
-      (isMine || booking.professionalId === undefined)
-    ) {
-      if (!isMine && !(myProfessional.approved ?? false)) {
-        throw new Error("Your professional account is pending approval");
-      }
-      const service = await ctx.db.get(booking.serviceId);
-      if (
-        !isMine &&
-        !(service && myProfessional.specialties.includes(service.categorySlug))
-      ) {
-        throw new Error("Not authorized for this service category");
-      }
-      await ctx.db.patch(args.bookingId, {
-        professionalId: myProfessional._id,
-        status: "confirmed",
-      });
+    if (args.status === "confirmed" && booking.status === "pending") {
+      await ctx.db.patch(args.bookingId, { status: "confirmed" });
       return;
     }
-
-    if (!isMine) throw new Error("Not authorized");
 
     if (
       args.status === "cancelled" &&

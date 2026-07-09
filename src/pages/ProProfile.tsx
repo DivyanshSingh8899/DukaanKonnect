@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/use-auth';
@@ -20,6 +21,7 @@ function BecomeProfessional() {
   const registerAsProfessional = useMutation(registerAsProfessionalRef);
   const [selected, setSelected] = useState<string[]>([]);
   const [bio, setBio] = useState('');
+  const [experienceYears, setExperienceYears] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const toggleCategory = (slug: string) => {
@@ -33,9 +35,17 @@ function BecomeProfessional() {
       toast.error('Please select at least one specialty');
       return;
     }
+    if (!experienceYears || Number(experienceYears) < 0) {
+      toast.error('Please enter your years of experience');
+      return;
+    }
     setIsSubmitting(true);
     try {
-      await registerAsProfessional({ specialties: selected, bio: bio || undefined });
+      await registerAsProfessional({
+        specialties: selected,
+        bio: bio || undefined,
+        experienceYears: Number(experienceYears),
+      });
       toast.success('Welcome! You are now a service professional.');
       navigate('/pro');
     } catch (error) {
@@ -57,6 +67,14 @@ function BecomeProfessional() {
           </p>
         </div>
 
+        <Card className="mb-6 border-primary/30 bg-primary/5">
+          <CardContent className="p-4 text-sm text-muted-foreground">
+            Service pricing is fixed by Dukaan Konnect and shown to customers upfront.
+            Once approved, our admin team will assign jobs to you based on your
+            specialties and experience — you don't need to bid or negotiate on price.
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle>Your Specialties</CardTitle>
@@ -76,17 +94,30 @@ function BecomeProfessional() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Bio (Optional)</label>
+              <label className="text-sm font-medium">Years of Experience</label>
+              <Input
+                type="number"
+                min={0}
+                value={experienceYears}
+                onChange={(e) => setExperienceYears(e.target.value)}
+                placeholder="e.g. 3"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                What work can you do? Describe your experience (Optional)
+              </label>
               <Textarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                placeholder="Tell customers about your experience..."
+                placeholder="Tell customers what you can do and about your experience..."
                 rows={4}
               />
             </div>
 
             <Button className="w-full" size="lg" onClick={handleSubmit} disabled={isSubmitting}>
-              {isSubmitting ? 'Registering...' : 'Start Accepting Jobs'}
+              {isSubmitting ? 'Registering...' : 'Submit for Approval'}
             </Button>
           </CardContent>
         </Card>
@@ -156,7 +187,7 @@ export default function ProProfile() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="text-center p-4 bg-gradient-to-br from-primary/5 to-accent/5 rounded-lg border">
                 <div className="flex items-center justify-center gap-1 text-lg font-semibold">
                   <Star className="w-4 h-4 fill-primary text-primary" />
@@ -172,6 +203,10 @@ export default function ProProfile() {
                   {myProfile.completedJobs}
                 </div>
                 <p className="text-xs text-muted-foreground">Jobs completed</p>
+              </div>
+              <div className="text-center p-4 bg-gradient-to-br from-primary/5 to-accent/5 rounded-lg border">
+                <div className="text-lg font-semibold">{myProfile.experienceYears ?? 0}</div>
+                <p className="text-xs text-muted-foreground">Years experience</p>
               </div>
             </div>
 
