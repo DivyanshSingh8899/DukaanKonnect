@@ -24,6 +24,7 @@ import {
   Droplet,
   Loader2,
   Mail,
+  Scissors,
   ShieldCheck,
   Sparkles,
   User,
@@ -134,6 +135,22 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
     { Icon: Droplet, className: "bottom-[24%] right-[9%]", delay: 0.8 },
   ];
 
+  const showcaseServices = [
+    { Icon: Sparkles, label: "Home Cleaning", color: "text-blue-500", bg: "bg-blue-500/10" },
+    { Icon: Droplet, label: "Plumbing", color: "text-cyan-500", bg: "bg-cyan-500/10" },
+    { Icon: Zap, label: "Electrical", color: "text-yellow-500", bg: "bg-yellow-500/10" },
+    { Icon: Scissors, label: "Salon & Spa", color: "text-pink-500", bg: "bg-pink-500/10" },
+  ];
+  const [showcaseIndex, setShowcaseIndex] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(
+      () => setShowcaseIndex((i) => (i + 1) % showcaseServices.length),
+      2500,
+    );
+    return () => clearInterval(interval);
+  }, [showcaseServices.length]);
+  const CurrentShowcase = showcaseServices[showcaseIndex];
+
   return (
     <div className="relative min-h-screen flex flex-col overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-background">
       {/* Animated decorative background */}
@@ -162,13 +179,58 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
       </div>
 
       {/* Auth Content */}
-      <div className="relative flex-1 flex items-center justify-center px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 24, scale: 0.96 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.45, ease: "easeOut" }}
-          className="flex items-center justify-center flex-col"
-        >
+      <div className="relative flex-1 flex items-center justify-center px-4 py-12">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-20 max-w-5xl w-full">
+          {/* Brand showcase */}
+          <motion.div
+            initial={{ opacity: 0, x: -24 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="text-center lg:text-left max-w-md"
+          >
+            <h1 className="text-4xl sm:text-5xl font-extrabold mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Dukaan Konnect
+            </h1>
+            <p className="text-muted-foreground text-base sm:text-lg mb-6">
+              Home services, on demand — book trusted professionals in
+              minutes.
+            </p>
+
+            <div className="relative h-48 sm:h-56 w-full max-w-sm mx-auto lg:mx-0 rounded-2xl border bg-card/60 backdrop-blur-sm shadow-xl overflow-hidden">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={showcaseIndex}
+                  initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 1.05, y: -10 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="absolute inset-0 flex flex-col items-center justify-center gap-3"
+                >
+                  <div className={`w-16 h-16 rounded-2xl ${CurrentShowcase.bg} flex items-center justify-center`}>
+                    <CurrentShowcase.Icon className={`w-8 h-8 ${CurrentShowcase.color}`} />
+                  </div>
+                  <p className="font-semibold text-lg">{CurrentShowcase.label}</p>
+                </motion.div>
+              </AnimatePresence>
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                {showcaseServices.map((_, i) => (
+                  <div
+                    key={i}
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      i === showcaseIndex ? "w-6 bg-primary" : "w-1.5 bg-muted-foreground/30"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+            className="flex items-center justify-center flex-col"
+          >
           <Card className="min-w-[350px] pb-0 border shadow-2xl shadow-primary/10 backdrop-blur-sm bg-card/95">
             <AnimatePresence mode="wait">
               {step === "signIn" ? (
@@ -436,7 +498,8 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
               )}
             </AnimatePresence>
           </Card>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
     </div>
   );
