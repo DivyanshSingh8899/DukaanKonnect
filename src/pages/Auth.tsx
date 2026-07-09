@@ -13,12 +13,13 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { useAuth } from "@/hooks/use-auth";
 import { updateProfileRef } from "@/lib/convexRefs";
 import { useMutation } from "convex/react";
 import { ROLES } from "@/convex/schema";
-import { ArrowRight, Loader2, Mail, User, UserX } from "lucide-react";
+import { ArrowRight, Briefcase, Loader2, Mail, User, UserX } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 
@@ -31,6 +32,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
   const updateProfile = useMutation(updateProfileRef);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [loginMode, setLoginMode] = useState<"customer" | "provider">("customer");
   const [step, setStep] = useState<"signIn" | { email: string; name: string }>("signIn");
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -77,6 +79,11 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
 
       if (step !== "signIn" && step.name) {
         await updateProfile({ name: step.name });
+      }
+
+      if (loginMode === "provider") {
+        navigate("/pro/profile");
+        return;
       }
 
       const redirect = redirectAfterAuth || "/";
@@ -131,9 +138,25 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                   </div>
                 <CardTitle className="text-xl">Get Started</CardTitle>
                 <CardDescription>
-                  Enter your email to log in or sign up
+                  {loginMode === "provider"
+                    ? "Sign up to offer your services and receive job requests"
+                    : "Enter your email to log in or sign up"}
                 </CardDescription>
               </CardHeader>
+              <div className="px-6">
+                <Tabs value={loginMode} onValueChange={(v) => setLoginMode(v as "customer" | "provider")}>
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="customer">
+                      <User className="w-4 h-4 mr-1.5" />
+                      Customer
+                    </TabsTrigger>
+                    <TabsTrigger value="provider">
+                      <Briefcase className="w-4 h-4 mr-1.5" />
+                      Service Provider
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
               <form onSubmit={handleEmailSubmit}>
                 <CardContent>
                   <div className="relative mb-3">
@@ -176,29 +199,31 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                     <p className="mt-2 text-sm text-red-500">{error}</p>
                   )}
                   
-                  <div className="mt-4">
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t" />
+                  {loginMode === "customer" && (
+                    <div className="mt-4">
+                      <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                          <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                          <span className="bg-background px-2 text-muted-foreground">
+                            Or
+                          </span>
+                        </div>
                       </div>
-                      <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-muted-foreground">
-                          Or
-                        </span>
-                      </div>
+
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full mt-4"
+                        onClick={handleGuestLogin}
+                        disabled={isLoading}
+                      >
+                        <UserX className="mr-2 h-4 w-4" />
+                        Continue as Guest
+                      </Button>
                     </div>
-                    
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full mt-4"
-                      onClick={handleGuestLogin}
-                      disabled={isLoading}
-                    >
-                      <UserX className="mr-2 h-4 w-4" />
-                      Continue as Guest
-                    </Button>
-                  </div>
+                  )}
                 </CardContent>
               </form>
             </>
