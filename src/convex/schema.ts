@@ -83,7 +83,19 @@ const schema = defineSchema(
       bio: v.optional(v.string()),
       approved: v.optional(v.boolean()),
       experienceYears: v.optional(v.number()),
+      idDocumentType: v.optional(
+        v.union(v.literal("aadhar"), v.literal("pan"), v.literal("driving_license")),
+      ),
+      idDocumentStorageId: v.optional(v.id("_storage")),
     }).index("by_user", ["userId"]),
+
+    professionalServices: defineTable({
+      professionalId: v.id("professionals"),
+      serviceId: v.id("services"),
+      price: v.number(),
+    })
+      .index("by_professional", ["professionalId"])
+      .index("by_service", ["serviceId"]),
 
     addresses: defineTable({
       userId: v.id("users"),

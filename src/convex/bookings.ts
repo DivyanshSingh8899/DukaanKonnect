@@ -23,6 +23,16 @@ export const create = mutation({
     const service = await ctx.db.get(args.serviceId);
     if (!service) throw new Error("Service not found");
 
+    let totalAmount = service.price;
+    if (args.professionalId) {
+      const customPrice = await ctx.db
+        .query("professionalServices")
+        .withIndex("by_professional", (q) => q.eq("professionalId", args.professionalId!))
+        .filter((q) => q.eq(q.field("serviceId"), args.serviceId))
+        .unique();
+      if (customPrice) totalAmount = customPrice.price;
+    }
+
     return await ctx.db.insert("bookings", {
       userId,
       serviceId: args.serviceId,
@@ -30,7 +40,7 @@ export const create = mutation({
       date: args.date,
       time: args.time,
       status: "pending",
-      totalAmount: service.price,
+      totalAmount,
       address: args.address,
       notes: args.notes,
       createdAt: new Date().toISOString(),

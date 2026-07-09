@@ -31,8 +31,23 @@ export interface RazorpayOrder {
   keyId: string;
 }
 
+export type IdDocumentType = "aadhar" | "pan" | "driving_license";
+
 export interface AdminProfessional extends Professional {
   email: string;
+  idDocumentType: IdDocumentType | null;
+  idDocumentUrl: string | null;
+}
+
+export interface MyProfessionalService {
+  id: string;
+  service: Service;
+  price: number;
+}
+
+export interface ProfessionalOffer {
+  professional: Professional;
+  price: number;
 }
 
 export interface AdminBooking {
@@ -109,9 +124,21 @@ export const professionalsMyProfileRef = makeFunctionReference<
 
 export const registerAsProfessionalRef = makeFunctionReference<
   "mutation",
-  { specialties: string[]; bio?: string; experienceYears: number },
+  {
+    specialties: string[];
+    bio?: string;
+    experienceYears: number;
+    idDocumentType: IdDocumentType;
+    idDocumentStorageId: Id<"_storage">;
+  },
   Id<"professionals">
 >("professionals:registerAsProfessional");
+
+export const generateIdUploadUrlRef = makeFunctionReference<
+  "mutation",
+  Record<string, never>,
+  string
+>("professionals:generateIdUploadUrl");
 
 export const addressesListMineRef = makeFunctionReference<
   "query",
@@ -292,3 +319,27 @@ export const adminListAllBookingsRef = makeFunctionReference<
   { status?: OrderStatus },
   AdminBooking[]
 >("admin:listAllBookings");
+
+export const myProfessionalServicesRef = makeFunctionReference<
+  "query",
+  Record<string, never>,
+  MyProfessionalService[]
+>("professionalServices:myServices");
+
+export const addOrUpdateProfessionalServiceRef = makeFunctionReference<
+  "mutation",
+  { serviceId: Id<"services">; price: number },
+  Id<"professionalServices">
+>("professionalServices:addOrUpdate");
+
+export const removeProfessionalServiceRef = makeFunctionReference<
+  "mutation",
+  { professionalServiceId: Id<"professionalServices"> },
+  void
+>("professionalServices:remove");
+
+export const professionalServicesForServiceRef = makeFunctionReference<
+  "query",
+  { serviceId: Id<"services"> },
+  ProfessionalOffer[]
+>("professionalServices:listForService");

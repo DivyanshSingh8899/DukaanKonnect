@@ -4,6 +4,12 @@ import { mutation, query } from "./_generated/server";
 import type { Doc } from "./_generated/dataModel";
 import { ROLES } from "./schema";
 
+const idDocumentTypeValidator = v.union(
+  v.literal("aadhar"),
+  v.literal("pan"),
+  v.literal("driving_license"),
+);
+
 export function toProfessional(p: Doc<"professionals">) {
   return {
     id: p._id,
@@ -42,11 +48,22 @@ export const myProfile = query({
   },
 });
 
+export const generateIdUploadUrl = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (userId === null) throw new Error("Not authenticated");
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
 export const registerAsProfessional = mutation({
   args: {
     specialties: v.array(v.string()),
     bio: v.optional(v.string()),
     experienceYears: v.number(),
+    idDocumentType: idDocumentTypeValidator,
+    idDocumentStorageId: v.id("_storage"),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -73,6 +90,8 @@ export const registerAsProfessional = mutation({
       specialties: args.specialties,
       bio: args.bio,
       experienceYears: args.experienceYears,
+      idDocumentType: args.idDocumentType,
+      idDocumentStorageId: args.idDocumentStorageId,
       approved: false,
     });
 

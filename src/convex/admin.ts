@@ -41,9 +41,14 @@ export const listProfessionals = query({
     return await Promise.all(
       filtered.map(async (p) => {
         const user = await ctx.db.get(p.userId);
+        const idDocumentUrl = p.idDocumentStorageId
+          ? await ctx.storage.getUrl(p.idDocumentStorageId)
+          : null;
         return {
           ...toProfessional(p),
           email: user?.email ?? "",
+          idDocumentType: p.idDocumentType ?? null,
+          idDocumentUrl,
         };
       }),
     );

@@ -26,6 +26,7 @@ import {
   serviceGetByIdRef,
   bookingsGetBookedSlotsRef,
   professionalsListBySpecialtyRef,
+  professionalServicesForServiceRef,
 } from '@/lib/convexRefs';
 import { getInitials } from '@/lib/utils';
 import type { Id } from '@/convex/_generated/dataModel';
@@ -122,6 +123,19 @@ export default function Booking() {
       professionalsListBySpecialtyRef,
       service ? { categorySlug: service.categorySlug } : 'skip'
     ) ?? [];
+
+  const professionalOffers =
+    useQuery(
+      professionalServicesForServiceRef,
+      service ? { serviceId: service.id as Id<'services'> } : 'skip'
+    ) ?? [];
+
+  const getOfferPrice = (professionalId: string) =>
+    professionalOffers.find((o) => o.professional.id === professionalId)?.price;
+
+  const selectedOfferPrice =
+    professional && professional.id !== 'any' ? getOfferPrice(professional.id) : undefined;
+  const effectivePrice = selectedOfferPrice ?? service?.price ?? 0;
 
   const handleNext = () => {
     if (step === 1 && !service) {
@@ -385,9 +399,16 @@ export default function Booking() {
                                   </AvatarFallback>
                                 </Avatar>
                                 <div className="flex-1">
-                                  <h4 className="font-semibold mb-1">
-                                    {prof.name}
-                                  </h4>
+                                  <div className="flex items-center justify-between gap-2">
+                                    <h4 className="font-semibold mb-1">
+                                      {prof.name}
+                                    </h4>
+                                    {getOfferPrice(prof.id) !== undefined && (
+                                      <span className="font-semibold text-primary">
+                                        ₹{getOfferPrice(prof.id)}
+                                      </span>
+                                    )}
+                                  </div>
                                   <div className="flex items-center gap-3 text-sm text-muted-foreground mb-2">
                                     <span>★ {prof.rating}</span>
                                     <span>•</span>
@@ -488,6 +509,12 @@ export default function Booking() {
                           <p className="font-semibold">{professional.name}</p>
                         </div>
                       )}
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">
+                          Total Amount
+                        </p>
+                        <p className="font-semibold text-primary">₹{effectivePrice}</p>
+                      </div>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -506,7 +533,7 @@ export default function Booking() {
                   <>
                     <div className="flex justify-between text-sm">
                       <span>Service Price</span>
-                      <span>₹{service.price}</span>
+                      <span>₹{effectivePrice}</span>
                     </div>
                     <div className="flex justify-between text-sm text-accent">
                       <span>Discount</span>
@@ -515,7 +542,7 @@ export default function Booking() {
                     <Separator />
                     <div className="flex justify-between font-semibold text-lg">
                       <span>Total Amount</span>
-                      <span className="text-primary">₹{service.price}</span>
+                      <span className="text-primary">₹{effectivePrice}</span>
                     </div>
                   </>
                 )}

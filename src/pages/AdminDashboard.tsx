@@ -136,6 +136,9 @@ function ProfessionalsTab() {
                   <div>
                     <p className="font-medium">{p.name}</p>
                     <p className="text-sm text-muted-foreground">{p.email}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {p.experienceYears ?? 0} years experience
+                    </p>
                     <div className="flex gap-1.5 flex-wrap mt-1.5">
                       {p.specialties.map((s) => (
                         <Badge key={s} variant="secondary" className="text-xs">
@@ -144,7 +147,17 @@ function ProfessionalsTab() {
                       ))}
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-2">
+                    {p.idDocumentUrl && (
+                      <a
+                        href={p.idDocumentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary underline underline-offset-2"
+                      >
+                        View {p.idDocumentType?.replace('_', ' ') ?? 'ID'}
+                      </a>
+                    )}
                     <Button size="sm" onClick={() => handleSetApproval(p.id, true)}>
                       Approve
                     </Button>

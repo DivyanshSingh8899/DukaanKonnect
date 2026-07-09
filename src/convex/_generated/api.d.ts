@@ -20,6 +20,7 @@ import type * as chat from "../chat.js";
 import type * as chatActions from "../chatActions.js";
 import type * as http from "../http.js";
 import type * as paymentActions from "../paymentActions.js";
+import type * as professionalServices from "../professionalServices.js";
 import type * as professionals from "../professionals.js";
 import type * as seed from "../seed.js";
 import type * as services from "../services.js";
@@ -44,6 +45,7 @@ declare const fullApi: ApiFromModules<{
   chatActions: typeof chatActions;
   http: typeof http;
   paymentActions: typeof paymentActions;
+  professionalServices: typeof professionalServices;
   professionals: typeof professionals;
   seed: typeof seed;
   services: typeof services;
