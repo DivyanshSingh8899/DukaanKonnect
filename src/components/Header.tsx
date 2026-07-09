@@ -18,6 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
 import { useQuery } from 'convex/react';
 import { bookingsListMineRef } from '@/lib/convexRefs';
+import { getInitials } from '@/lib/utils';
 import { ROLES } from '@/convex/schema';
 import { useTheme } from 'next-themes';
 
@@ -125,7 +126,7 @@ export function Header() {
               >
                 <Avatar className="w-8 h-8">
                   <AvatarImage src={user.image ?? undefined} alt={user.name ?? 'User'} />
-                  <AvatarFallback>{user.name?.[0] ?? 'U'}</AvatarFallback>
+                  <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                 </Avatar>
               </Button>
             )}

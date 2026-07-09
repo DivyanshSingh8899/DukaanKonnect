@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/use-auth';
 import { useQuery, useMutation } from 'convex/react';
 import { categoriesListRef, registerAsProfessionalRef, professionalsMyProfileRef } from '@/lib/convexRefs';
+import { getInitials } from '@/lib/utils';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
@@ -136,7 +137,7 @@ export default function ProProfile() {
             <div className="flex flex-col items-center text-center mb-6 -mt-10">
               <Avatar className="w-24 h-24 mb-4 border-4 border-background shadow-md">
                 <AvatarImage src={myProfile.avatar} />
-                <AvatarFallback className="text-2xl">{myProfile.name[0]}</AvatarFallback>
+                <AvatarFallback className="text-2xl">{getInitials(myProfile.name)}</AvatarFallback>
               </Avatar>
               <h3 className="text-xl font-semibold mb-1">{myProfile.name}</h3>
               {myProfile.bio && (

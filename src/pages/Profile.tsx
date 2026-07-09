@@ -35,6 +35,7 @@ import {
 import { useAuth } from '@/hooks/use-auth';
 import { useQuery, useMutation } from 'convex/react';
 import { addressesListMineRef, updateProfileRef, addAddressRef } from '@/lib/convexRefs';
+import { getInitials } from '@/lib/utils';
 import { ROLES } from '@/convex/schema';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -162,7 +163,7 @@ export default function Profile() {
                   <Avatar className="w-24 h-24 mb-4 border-4 border-background shadow-md">
                     <AvatarImage src={user?.image ?? undefined} />
                     <AvatarFallback className="text-2xl">
-                      {user?.name?.[0] ?? 'U'}
+                      {getInitials(user?.name)}
                     </AvatarFallback>
                   </Avatar>
                   <h3 className="text-xl font-semibold mb-1">

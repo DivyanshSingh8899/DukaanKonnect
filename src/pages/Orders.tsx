@@ -22,6 +22,7 @@ import { useNavigate } from 'react-router';
 import { format } from 'date-fns';
 import { useQuery, useMutation } from 'convex/react';
 import { bookingsListMineRef, bookingsUpdateStatusRef } from '@/lib/convexRefs';
+import { getInitials } from '@/lib/utils';
 import type { Id } from '@/convex/_generated/dataModel';
 import { toast } from 'sonner';
 
@@ -128,7 +129,7 @@ function OrderCard({ order, index }: { order: Order; index: number }) {
                   <Avatar className="w-10 h-10">
                     <AvatarImage src={order.professional.avatar} />
                     <AvatarFallback>
-                      {order.professional.name[0]}
+                      {getInitials(order.professional.name)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">

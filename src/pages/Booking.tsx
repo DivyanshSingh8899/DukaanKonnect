@@ -28,6 +28,7 @@ import {
   bookingsGetBookedSlotsRef,
   professionalsListBySpecialtyRef,
 } from '@/lib/convexRefs';
+import { getInitials } from '@/lib/utils';
 import type { Id } from '@/convex/_generated/dataModel';
 import type { Professional, TimeSlot } from '@/types';
 import { useNavigate, useSearchParams } from 'react-router';
@@ -432,7 +433,7 @@ export default function Booking() {
                                 <Avatar className="w-16 h-16">
                                   <AvatarImage src={prof.avatar} />
                                   <AvatarFallback>
-                                    {prof.name[0]}
+                                    {getInitials(prof.name)}
                                   </AvatarFallback>
                                 </Avatar>
                                 <div className="flex-1">
