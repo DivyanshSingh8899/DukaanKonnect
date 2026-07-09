@@ -11,6 +11,7 @@ import {
   Moon,
   Sun,
   LayoutDashboard,
+  ShieldCheck,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +36,7 @@ export function Header() {
   const { theme, setTheme } = useTheme();
   const { user, isAuthenticated } = useAuth();
   const isProfessional = user?.role === ROLES.PROFESSIONAL;
+  const isAdmin = user?.role === ROLES.ADMIN;
 
   const pendingCount = useQuery(
     bookingsListMineRef,
@@ -50,6 +52,7 @@ export function Header() {
         { label: 'Home', icon: Home, path: '/' },
         { label: 'Services', icon: Search, path: '/services' },
         { label: 'Orders', icon: ShoppingBag, path: '/orders' },
+        ...(isAdmin ? [{ label: 'Admin', icon: ShieldCheck, path: '/admin' }] : []),
         { label: 'Profile', icon: User, path: '/profile' },
       ];
 

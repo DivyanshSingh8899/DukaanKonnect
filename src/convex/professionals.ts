@@ -14,6 +14,7 @@ export function toProfessional(p: Doc<"professionals">) {
     completedJobs: p.completedJobs,
     specialties: p.specialties,
     bio: p.bio,
+    approved: p.approved ?? false,
   };
 }
 
@@ -22,7 +23,7 @@ export const listBySpecialty = query({
   handler: async (ctx, args) => {
     const docs = await ctx.db.query("professionals").collect();
     return docs
-      .filter((p) => p.specialties.includes(args.categorySlug))
+      .filter((p) => (p.approved ?? false) && p.specialties.includes(args.categorySlug))
       .map(toProfessional);
   },
 });
@@ -69,6 +70,7 @@ export const registerAsProfessional = mutation({
       completedJobs: 0,
       specialties: args.specialties,
       bio: args.bio,
+      approved: false,
     });
 
     await ctx.db.patch(userId, { role: ROLES.PROFESSIONAL });

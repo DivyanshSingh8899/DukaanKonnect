@@ -137,7 +137,7 @@ export const listForProfessional = query({
 
     const candidates = assigned;
 
-    if (!args.status || args.status === "pending") {
+    if ((myProfessional.approved ?? false) && (!args.status || args.status === "pending")) {
       const pending = await ctx.db
         .query("bookings")
         .withIndex("by_status", (q) => q.eq("status", "pending"))
@@ -220,6 +220,9 @@ export const updateStatus = mutation({
       booking.status === "pending" &&
       (isMine || booking.professionalId === undefined)
     ) {
+      if (!isMine && !(myProfessional.approved ?? false)) {
+        throw new Error("Your professional account is pending approval");
+      }
       const service = await ctx.db.get(booking.serviceId);
       if (
         !isMine &&

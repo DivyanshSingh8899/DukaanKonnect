@@ -131,6 +131,17 @@ export default function ProProfile() {
           <p className="text-muted-foreground">Your public profile and stats</p>
         </div>
 
+        {!myProfile.approved && (
+          <Card className="mb-6 border-yellow-500/50 bg-yellow-500/5">
+            <CardContent className="p-4 text-sm">
+              <p className="font-medium">Pending approval</p>
+              <p className="text-muted-foreground mt-1">
+                Your account is awaiting review before you can start receiving job requests.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
         <Card className="overflow-hidden">
           <div className="h-16 bg-gradient-to-r from-primary to-accent" />
           <CardContent className="pt-0">

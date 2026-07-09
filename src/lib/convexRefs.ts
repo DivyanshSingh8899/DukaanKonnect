@@ -31,6 +31,34 @@ export interface RazorpayOrder {
   keyId: string;
 }
 
+export interface AdminProfessional extends Professional {
+  email: string;
+}
+
+export interface AdminBooking {
+  id: string;
+  service: Service;
+  professional: Professional | null;
+  customerName: string;
+  customerEmail: string;
+  date: string;
+  time: string;
+  status: OrderStatus;
+  totalAmount: number;
+  address: string;
+  createdAt: string;
+}
+
+export interface AdminStats {
+  totalBookings: number;
+  pendingBookings: number;
+  completedBookings: number;
+  totalProfessionals: number;
+  approvedProfessionals: number;
+  pendingProfessionals: number;
+  revenue: number;
+}
+
 export const currentUserRef = makeFunctionReference<
   "query",
   Record<string, never>,
@@ -161,3 +189,87 @@ export const chatSendMessageRef = makeFunctionReference<
   { content: string },
   void
 >("chatActions:sendMessage");
+
+export const categoriesCreateRef = makeFunctionReference<
+  "mutation",
+  { name: string; slug: string; icon: string; description: string },
+  Id<"categories">
+>("categories:create");
+
+export const categoriesUpdateRef = makeFunctionReference<
+  "mutation",
+  {
+    categoryId: Id<"categories">;
+    name?: string;
+    icon?: string;
+    description?: string;
+  },
+  void
+>("categories:update");
+
+export const categoriesRemoveRef = makeFunctionReference<
+  "mutation",
+  { categoryId: Id<"categories"> },
+  void
+>("categories:remove");
+
+export const servicesCreateRef = makeFunctionReference<
+  "mutation",
+  {
+    name: string;
+    slug: string;
+    categoryId: Id<"categories">;
+    description: string;
+    price: number;
+    duration: number;
+    image: string;
+    featured: boolean;
+    tags: string[];
+  },
+  Id<"services">
+>("services:create");
+
+export const servicesUpdateRef = makeFunctionReference<
+  "mutation",
+  {
+    serviceId: Id<"services">;
+    name?: string;
+    description?: string;
+    price?: number;
+    duration?: number;
+    image?: string;
+    featured?: boolean;
+    tags?: string[];
+  },
+  void
+>("services:update");
+
+export const servicesRemoveRef = makeFunctionReference<
+  "mutation",
+  { serviceId: Id<"services"> },
+  void
+>("services:remove");
+
+export const adminStatsRef = makeFunctionReference<
+  "query",
+  Record<string, never>,
+  AdminStats
+>("admin:stats");
+
+export const adminListProfessionalsRef = makeFunctionReference<
+  "query",
+  { approved?: boolean },
+  AdminProfessional[]
+>("admin:listProfessionals");
+
+export const adminSetProfessionalApprovalRef = makeFunctionReference<
+  "mutation",
+  { professionalId: Id<"professionals">; approved: boolean },
+  void
+>("admin:setProfessionalApproval");
+
+export const adminListAllBookingsRef = makeFunctionReference<
+  "query",
+  { status?: OrderStatus },
+  AdminBooking[]
+>("admin:listAllBookings");

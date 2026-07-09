@@ -9,6 +9,8 @@
  */
 
 import type * as addresses from "../addresses.js";
+import type * as admin from "../admin.js";
+import type * as adminAuth from "../adminAuth.js";
 import type * as auth from "../auth.js";
 import type * as auth_emailOtp from "../auth/emailOtp.js";
 import type * as auth_sendOtpEmail from "../auth/sendOtpEmail.js";
@@ -31,6 +33,8 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   addresses: typeof addresses;
+  admin: typeof admin;
+  adminAuth: typeof adminAuth;
   auth: typeof auth;
   "auth/emailOtp": typeof auth_emailOtp;
   "auth/sendOtpEmail": typeof auth_sendOtpEmail;
