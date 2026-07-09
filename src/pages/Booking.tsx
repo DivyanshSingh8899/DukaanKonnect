@@ -19,11 +19,10 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { useBookingStore } from '@/store/useBookingStore';
-import { useQuery, useAction } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
 import {
   currentUserRef,
-  paymentsCreateOrderRef,
-  paymentsVerifyAndBookRef,
+  bookingsCreateRef,
   serviceGetByIdRef,
   bookingsGetBookedSlotsRef,
   professionalsListBySpecialtyRef,
@@ -79,8 +78,7 @@ export default function Booking() {
   } = useBookingStore();
 
   const currentUser = useQuery(currentUserRef, {});
-  const createOrder = useAction(paymentsCreateOrderRef);
-  const verifyAndBook = useAction(paymentsVerifyAndBookRef);
+  const createBooking = useMutation(bookingsCreateRef);
 
   const serviceIdParam = searchParams.get('service');
   const fetchedService = useQuery(
@@ -156,75 +154,25 @@ export default function Booking() {
     }
     if (!service || !date || !timeSlot) return;
 
-    const RazorpayCheckout = (window as any).Razorpay;
-    if (!RazorpayCheckout) {
-      toast.error('Payment could not load. Please refresh and try again.');
-      return;
-    }
-
     setIsSubmitting(true);
     try {
-      const order = await createOrder({ serviceId: service.id as Id<'services'> });
-
-      const razorpay = new RazorpayCheckout({
-        key: order.keyId,
-        amount: order.amount,
-        currency: order.currency,
-        order_id: order.orderId,
-        name: 'Dukaan Konnect',
-        description: service.name,
-        prefill: {
-          name: currentUser?.name ?? undefined,
-          email: currentUser?.email ?? undefined,
-          contact: currentUser?.phone ?? undefined,
-        },
-        theme: { color: '#3949ab' },
-        handler: async (response: {
-          razorpay_order_id: string;
-          razorpay_payment_id: string;
-          razorpay_signature: string;
-        }) => {
-          try {
-            await verifyAndBook({
-              razorpayOrderId: response.razorpay_order_id,
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpaySignature: response.razorpay_signature,
-              serviceId: service.id as Id<'services'>,
-              professionalId:
-                professional && professional.id !== 'any'
-                  ? (professional.id as Id<'professionals'>)
-                  : undefined,
-              date: format(date, 'yyyy-MM-dd'),
-              time: timeSlot.time,
-              address,
-              notes: notes || undefined,
-            });
-            toast.success('Payment successful! Booking confirmed.');
-            resetBooking();
-            navigate('/orders');
-          } catch (error) {
-            toast.error(
-              error instanceof Error ? error.message : 'Payment verification failed'
-            );
-          } finally {
-            setIsSubmitting(false);
-          }
-        },
-        modal: {
-          ondismiss: () => setIsSubmitting(false),
-        },
+      await createBooking({
+        serviceId: service.id as Id<'services'>,
+        professionalId:
+          professional && professional.id !== 'any'
+            ? (professional.id as Id<'professionals'>)
+            : undefined,
+        date: format(date, 'yyyy-MM-dd'),
+        time: timeSlot.time,
+        address,
+        notes: notes || undefined,
       });
-
-      razorpay.on('payment.failed', () => {
-        toast.error('Payment failed. Please try again.');
-        setIsSubmitting(false);
-      });
-
-      razorpay.open();
+      toast.success('Booking confirmed!');
+      resetBooking();
+      navigate('/orders');
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : 'Failed to start payment'
-      );
+      toast.error(error instanceof Error ? error.message : 'Failed to create booking');
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -596,9 +544,7 @@ export default function Booking() {
                       onClick={handleBooking}
                       disabled={isSubmitting}
                     >
-                      {isSubmitting
-                        ? 'Processing...'
-                        : `Pay ₹${service?.price ?? ''} & Confirm`}
+                      {isSubmitting ? 'Booking...' : 'Confirm Booking'}
                     </Button>
                   )}
                 </div>

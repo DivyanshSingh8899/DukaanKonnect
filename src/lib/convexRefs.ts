@@ -156,6 +156,19 @@ export const bookingsUpdateStatusRef = makeFunctionReference<
   void
 >("bookings:updateStatus");
 
+export const bookingsCreateRef = makeFunctionReference<
+  "mutation",
+  {
+    serviceId: Id<"services">;
+    professionalId?: Id<"professionals">;
+    date: string;
+    time: string;
+    address: string;
+    notes?: string;
+  },
+  Id<"bookings">
+>("bookings:create");
+
 export const paymentsCreateOrderRef = makeFunctionReference<
   "action",
   { serviceId: Id<"services"> },
