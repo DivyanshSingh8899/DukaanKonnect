@@ -22,6 +22,7 @@ import type * as http from "../http.js";
 import type * as paymentActions from "../paymentActions.js";
 import type * as professionalServices from "../professionalServices.js";
 import type * as professionals from "../professionals.js";
+import type * as razorpay from "../razorpay.js";
 import type * as seed from "../seed.js";
 import type * as services from "../services.js";
 import type * as users from "../users.js";
@@ -47,6 +48,7 @@ declare const fullApi: ApiFromModules<{
   paymentActions: typeof paymentActions;
   professionalServices: typeof professionalServices;
   professionals: typeof professionals;
+  razorpay: typeof razorpay;
   seed: typeof seed;
   services: typeof services;
   users: typeof users;

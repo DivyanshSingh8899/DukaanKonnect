@@ -157,7 +157,7 @@ export default function Profile() {
           {/* Profile Card */}
           <div className="lg:col-span-1">
             <Card className="overflow-hidden">
-              <div className="h-20 bg-gradient-to-r from-primary to-accent" />
+              <div className="h-20 bg-linear-to-r from-primary to-accent" />
               <CardContent className="pt-0">
                 <div className="flex flex-col items-center text-center -mt-12">
                   <Avatar className="w-24 h-24 mb-4 border-4 border-background shadow-md">

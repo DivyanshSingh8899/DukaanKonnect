@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Users,
+  ShieldCheck,
 } from 'lucide-react';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { useBookingStore } from '@/store/useBookingStore';
-import { useQuery, useMutation } from 'convex/react';
+import { useQuery, useMutation, useAction } from 'convex/react';
 import {
   currentUserRef,
   bookingsCreateRef,
@@ -27,6 +28,8 @@ import {
   bookingsGetBookedSlotsRef,
   professionalsListBySpecialtyRef,
   professionalServicesForServiceRef,
+  razorpayCreateOrderRef,
+  razorpayVerifyPaymentRef,
 } from '@/lib/convexRefs';
 import { getInitials } from '@/lib/utils';
 import type { Id } from '@/convex/_generated/dataModel';
@@ -57,6 +60,54 @@ const ANY_PROFESSIONAL: Professional = {
   specialties: [],
 };
 
+/* ------------------------------------------------------------------ */
+/*  Razorpay checkout types + lazy script loader                       */
+/* ------------------------------------------------------------------ */
+
+declare global {
+  interface Window {
+    Razorpay: new (options: RazorpayOptions) => { open: () => void };
+  }
+}
+
+interface RazorpayOptions {
+  key: string;
+  amount: number; // paise
+  currency: string;
+  name: string;
+  description?: string;
+  order_id: string;
+  prefill?: { name?: string; email?: string; contact?: string };
+  theme?: { color?: string };
+  handler: (res: RazorpayResponse) => void;
+  modal?: { ondismiss?: () => void };
+}
+
+interface RazorpayResponse {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
+
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (window.Razorpay) return resolve(true);
+    const existing = document.querySelector<HTMLScriptElement>(
+      'script[src="https://checkout.razorpay.com/v1/checkout.js"]'
+    );
+    if (existing) {
+      existing.addEventListener('load', () => resolve(true));
+      existing.addEventListener('error', () => resolve(false));
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
+
 export default function Booking() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -80,6 +131,8 @@ export default function Booking() {
 
   const currentUser = useQuery(currentUserRef, {});
   const createBooking = useMutation(bookingsCreateRef);
+  const createRazorpayOrder = useAction(razorpayCreateOrderRef);
+  const verifyPayment = useAction(razorpayVerifyPaymentRef);
 
   const serviceIdParam = searchParams.get('service');
   const fetchedService = useQuery(
@@ -170,6 +223,44 @@ export default function Booking() {
 
     setIsSubmitting(true);
     try {
+      // 1. Ensure the Razorpay checkout script is available
+      const loaded = await loadRazorpayScript();
+      if (!loaded) throw new Error('Could not load payment gateway');
+
+      // 2. Create the order on the backend
+      const order = await createRazorpayOrder({ amount: effectivePrice });
+
+      // 3. Open Razorpay checkout and await the outcome
+      const payment = await new Promise<RazorpayResponse>((resolve, reject) => {
+        const rzp = new window.Razorpay({
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID, // public key id — safe on the client
+          amount: order.amount,
+          currency: order.currency,
+          name: 'DukaanKonnect',
+          description: service.name,
+          order_id: order.orderId,
+          prefill: {
+            name: currentUser?.name ?? '',
+            email: currentUser?.email ?? '',
+            contact: currentUser?.phone ?? '',
+          },
+          theme: { color: '#2563eb' },
+          handler: (res) => resolve(res),
+          modal: {
+            ondismiss: () => reject(new Error('Payment cancelled')),
+          },
+        });
+        rzp.open();
+      });
+
+      // 4. Verify the signature on the backend
+      await verifyPayment({
+        razorpayOrderId: payment.razorpay_order_id,
+        razorpayPaymentId: payment.razorpay_payment_id,
+        razorpaySignature: payment.razorpay_signature,
+      });
+
+      // 5. Only now create the confirmed booking
       await createBooking({
         serviceId: service.id as Id<'services'>,
         professionalId:
@@ -180,12 +271,15 @@ export default function Booking() {
         time: timeSlot.time,
         address,
         notes: notes || undefined,
+        paymentId: payment.razorpay_payment_id,
       });
-      toast.success('Booking confirmed!');
+
+      toast.success('Payment successful — booking confirmed!');
       resetBooking();
       navigate('/orders');
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to create booking');
+      const msg = error instanceof Error ? error.message : 'Payment failed';
+      toast.error(msg === 'Payment cancelled' ? 'Payment cancelled' : msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -553,6 +647,7 @@ export default function Booking() {
                       variant="outline"
                       className="w-full"
                       onClick={() => setStep(step - 1)}
+                      disabled={isSubmitting}
                     >
                       <ChevronLeft className="w-4 h-4 mr-2" />
                       Previous
@@ -571,10 +666,17 @@ export default function Booking() {
                       onClick={handleBooking}
                       disabled={isSubmitting}
                     >
-                      {isSubmitting ? 'Booking...' : 'Confirm Booking'}
+                      {isSubmitting ? 'Processing...' : `Pay ₹${effectivePrice} & Confirm`}
                     </Button>
                   )}
                 </div>
+
+                {step === 4 && (
+                  <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground pt-1">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    Secure payment via Razorpay
+                  </p>
+                )}
               </CardContent>
             </Card>
           </div>

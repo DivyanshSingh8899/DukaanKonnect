@@ -122,7 +122,7 @@ export default function Services() {
           backgroundSize: '20px 20px',
         }}
       >
-        <div className="container mx-auto px-4 py-10">
+        <div className="container mx-auto max-w-6xl px-4 py-10">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
             Explore Services
           </h1>
@@ -131,7 +131,7 @@ export default function Services() {
           </p>
         </div>
       </div>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto max-w-6xl px-4 py-8">
 
         {/* Search and Filters Bar */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
@@ -143,13 +143,13 @@ export default function Services() {
               placeholder="Search services..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 rounded-full"
             />
             {searchQuery && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                className="absolute right-1 top-1/2 rounded-full -translate-y-1/2 h-7 w-7"
                 onClick={() => setSearchQuery('')}
               >
                 <X className="w-4 h-4" />
@@ -188,7 +188,7 @@ export default function Services() {
           {/* Advanced Filters (Mobile) */}
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="outline" className="w-full md:w-auto relative">
+              <Button variant="outline" className="w-full md:w-auto relative rounded-full">
                 <SlidersHorizontal className="w-4 h-4 mr-2" />
                 Filters
                 {activeFiltersCount > 0 && (

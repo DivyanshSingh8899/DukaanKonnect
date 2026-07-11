@@ -26,7 +26,7 @@ function FounderCard({ name, role, institute, index }: FounderProps) {
     >
       <Card className="text-center hover:shadow-lg transition-all">
         <CardContent className="pt-8 pb-6 px-6 flex flex-col items-center">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mb-4 shadow-md">
+          <div className="w-24 h-24 rounded-full bg-linear-to-br from-primary to-accent flex items-center justify-center mb-4 shadow-md">
             <span className="text-2xl font-bold text-primary-foreground">
               {initials}
             </span>

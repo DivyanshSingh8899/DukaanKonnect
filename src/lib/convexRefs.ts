@@ -1,6 +1,7 @@
 import { makeFunctionReference } from "convex/server";
 import type { Doc, Id } from "@/convex/_generated/dataModel";
 import type { Category, Service, Professional, Address, Order, OrderStatus } from "@/types";
+import { api } from '@/convex/_generated/api';
 
 export interface ChatMessage {
   id: string;
@@ -343,3 +344,6 @@ export const professionalServicesForServiceRef = makeFunctionReference<
   { serviceId: Id<"services"> },
   ProfessionalOffer[]
 >("professionalServices:listForService");
+
+export const razorpayCreateOrderRef = api.razorpay.createRazorpayOrder;
+export const razorpayVerifyPaymentRef = api.razorpay.verifyPayment;

@@ -25,6 +25,7 @@ import { bookingsListMineRef, bookingsUpdateStatusRef } from '@/lib/convexRefs';
 import { getInitials } from '@/lib/utils';
 import type { Id } from '@/convex/_generated/dataModel';
 import { toast } from 'sonner';
+import { BookingCard } from '../components/ui/card';
 
 const statusConfig: Record<
   OrderStatus,
@@ -76,9 +77,9 @@ function OrderCard({ order, index }: { order: Order; index: number }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
+      // transition={{ delay: index * 0.05 }}
     >
-      <Card className="hover:shadow-md transition-all">
+      <BookingCard className="hover:shadow-md transition-all">
         <CardContent className="p-0">
           <div className="flex flex-col md:flex-row gap-4 p-6">
             {/* Service Image */}
@@ -188,7 +189,7 @@ function OrderCard({ order, index }: { order: Order; index: number }) {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </BookingCard>
     </motion.div>
   );
 }
@@ -211,7 +212,7 @@ export default function Orders() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto max-w-6xl px-4 py-10">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">My Orders</h1>
