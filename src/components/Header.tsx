@@ -67,8 +67,8 @@ export function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              // whileHover={{ scale: 1.05 }}
+              // whileTap={{ scale: 0.95 }}
               className="flex items-center"
             >
               <div className="w-9 h-8 rounded-lg bg-primary flex items-center justify-center">

@@ -55,9 +55,9 @@ function ProBookingCard({ booking, index }: { booking: ProBooking; index: number
       transition={{ delay: index * 0.05 }}
     >
       <Card className="hover:shadow-md transition-all">
-        <CardContent className="p-6">
+        <CardContent className="px-6">
           <div className="flex flex-col md:flex-row gap-4">
-            <div className="w-full md:w-28 h-28 rounded-lg overflow-hidden flex-shrink-0">
+            <div className="w-full md:w-28 h-28 rounded-lg overflow-hidden shrink-0">
               <img
                 src={booking.service.image}
                 alt={booking.service.name}
@@ -70,7 +70,7 @@ function ProBookingCard({ booking, index }: { booking: ProBooking; index: number
                   <h3 className="font-semibold text-lg mb-1">{booking.service.name}</h3>
                   <p className="text-sm text-muted-foreground">Customer: {booking.customerName}</p>
                 </div>
-                <Badge variant="secondary">
+                <Badge variant="secondary" className="text-lg font-semibold">
                   ₹{booking.totalAmount}
                 </Badge>
               </div>
@@ -94,29 +94,7 @@ function ProBookingCard({ booking, index }: { booking: ProBooking; index: number
               )}
 
               <div className="flex gap-2 pt-2 border-t">
-                {booking.status === 'pending' && (
-                  <>
-                    <Button size="sm" disabled={isUpdating} onClick={() => handleUpdate('confirmed')}>
-                      Accept
-                    </Button>
-                    {booking.isAssignedToMe && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={isUpdating}
-                        onClick={() => handleUpdate('cancelled')}
-                      >
-                        Decline
-                      </Button>
-                    )}
-                  </>
-                )}
                 {booking.status === 'confirmed' && (
-                  <Button size="sm" disabled={isUpdating} onClick={() => handleUpdate('in_progress')}>
-                    Start Job
-                  </Button>
-                )}
-                {booking.status === 'in_progress' && (
                   <Button size="sm" disabled={isUpdating} onClick={() => handleUpdate('completed')}>
                     Mark Complete
                   </Button>
@@ -155,7 +133,7 @@ export default function ProDashboard() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto max-w-6xl px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Professional Dashboard</h1>
           <p className="text-muted-foreground">

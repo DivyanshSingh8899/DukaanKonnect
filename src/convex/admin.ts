@@ -45,7 +45,7 @@ export const listProfessionals = query({
           ? await ctx.storage.getUrl(p.idDocumentStorageId)
           : null;
         return {
-          ...toProfessional(p),
+          ...toProfessional(ctx, p),
           email: user?.email ?? "",
           idDocumentType: p.idDocumentType ?? null,
           idDocumentUrl,
@@ -108,7 +108,7 @@ export const listAllBookings = query({
           return {
             id: b._id,
             service: toService(service),
-            professional: professional ? toProfessional(professional) : null,
+            professional: professional ? toProfessional(ctx, professional) : null,
             customerName: customer?.name ?? "Unknown",
             customerEmail: customer?.email ?? "",
             date: b.date,

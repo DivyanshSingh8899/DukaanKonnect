@@ -234,7 +234,7 @@ export default function Booking() {
       const payment = await new Promise<RazorpayResponse>((resolve, reject) => {
         const rzp = new window.Razorpay({
           key: import.meta.env.VITE_RAZORPAY_KEY_ID, // public key id — safe on the client
-          amount: order.amount,
+          amount: Number(order.amount),
           currency: order.currency,
           name: 'DukaanKonnect',
           description: service.name,
@@ -271,7 +271,7 @@ export default function Booking() {
         time: timeSlot.time,
         address,
         notes: notes || undefined,
-        paymentId: payment.razorpay_payment_id,
+        // paymentId: payment.razorpay_payment_id,
       });
 
       toast.success('Payment successful — booking confirmed!');

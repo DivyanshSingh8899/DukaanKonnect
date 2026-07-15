@@ -126,6 +126,7 @@ export const professionalsMyProfileRef = makeFunctionReference<
 export const registerAsProfessionalRef = makeFunctionReference<
   "mutation",
   {
+    fullName: string;
     specialties: string[];
     bio?: string;
     experienceYears: number;

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState } from "react";
+import { motion } from "framer-motion";
 import {
   Calendar,
   Clock,
@@ -9,51 +9,51 @@ import {
   CheckCircle2,
   XCircle,
   Loader2,
-} from 'lucide-react';
-import { Layout } from '@/components/Layout';
-import { EmptyState } from '@/components/EmptyState';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { OrderStatus, Order } from '@/types';
-import { useNavigate } from 'react-router';
-import { format } from 'date-fns';
-import { useQuery, useMutation } from 'convex/react';
-import { bookingsListMineRef, bookingsUpdateStatusRef } from '@/lib/convexRefs';
-import { getInitials } from '@/lib/utils';
-import type { Id } from '@/convex/_generated/dataModel';
-import { toast } from 'sonner';
-import { BookingCard } from '../components/ui/card';
+} from "lucide-react";
+import { Layout } from "@/components/Layout";
+import { EmptyState } from "@/components/EmptyState";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { OrderStatus, Order } from "@/types";
+import { useNavigate } from "react-router";
+import { format } from "date-fns";
+import { useQuery, useMutation } from "convex/react";
+import { bookingsListMineRef, bookingsUpdateStatusRef } from "@/lib/convexRefs";
+import { getInitials } from "@/lib/utils";
+import type { Id } from "@/convex/_generated/dataModel";
+import { toast } from "sonner";
+import { BookingCard } from "../components/ui/card";
 
 const statusConfig: Record<
   OrderStatus,
   { label: string; color: string; icon: typeof CheckCircle2 }
 > = {
   pending: {
-    label: 'Pending',
-    color: 'bg-yellow-500',
+    label: "Pending",
+    color: "bg-yellow-500",
     icon: Clock,
   },
   confirmed: {
-    label: 'Confirmed',
-    color: 'bg-blue-500',
+    label: "Confirmed",
+    color: "bg-blue-500",
     icon: CheckCircle2,
   },
   in_progress: {
-    label: 'In Progress',
-    color: 'bg-purple-500',
+    label: "In Progress",
+    color: "bg-purple-500",
     icon: Loader2,
   },
   completed: {
-    label: 'Completed',
-    color: 'bg-green-500',
+    label: "Completed",
+    color: "bg-green-500",
     icon: CheckCircle2,
   },
   cancelled: {
-    label: 'Cancelled',
-    color: 'bg-red-500',
+    label: "Cancelled",
+    color: "bg-red-500",
     icon: XCircle,
   },
 };
@@ -61,15 +61,28 @@ const statusConfig: Record<
 function OrderCard({ order, index }: { order: Order; index: number }) {
   const navigate = useNavigate();
   const updateStatus = useMutation(bookingsUpdateStatusRef);
-  const config = statusConfig[order.status];
+
+  const displayStatus: OrderStatus =
+    order.status === "cancelled"
+      ? "cancelled"
+      : order.professional
+        ? "confirmed"
+        : "pending";
+
+  const config = statusConfig[displayStatus];
   const StatusIcon = config.icon;
 
   const handleCancel = async () => {
     try {
-      await updateStatus({ bookingId: order.id as Id<'bookings'>, status: 'cancelled' });
-      toast.success('Booking cancelled');
+      await updateStatus({
+        bookingId: order.id as Id<"bookings">,
+        status: "cancelled",
+      });
+      toast.success("Booking cancelled");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to cancel booking');
+      toast.error(
+        error instanceof Error ? error.message : "Failed to cancel booking",
+      );
     }
   };
 
@@ -104,7 +117,7 @@ function OrderCard({ order, index }: { order: Order; index: number }) {
                 </div>
                 <Badge
                   variant="secondary"
-                  className={`${config.color} text-white shadow-sm px-2.5 py-1`}
+                  className={`${config.color} text-black shadow-sm px-2.5 py-1`}
                 >
                   <StatusIcon className="w-3 h-3 mr-1" />
                   {config.label}
@@ -115,7 +128,7 @@ function OrderCard({ order, index }: { order: Order; index: number }) {
                 <div className="flex items-center text-sm">
                   <Calendar className="w-4 h-4 mr-2 text-muted-foreground" />
                   <span>
-                    {format(new Date(order.date), 'PP')} at {order.time}
+                    {format(new Date(order.date), "PP")} at {order.time}
                   </span>
                 </div>
                 <div className="flex items-center text-sm">
@@ -138,7 +151,8 @@ function OrderCard({ order, index }: { order: Order; index: number }) {
                       {order.professional.name}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      ★ {order.professional.rating} • {order.professional.completedJobs} jobs
+                      ★ {order.professional.rating} •{" "}
+                      {order.professional.completedJobs} jobs
                     </p>
                   </div>
                   <Button variant="outline" size="sm">
@@ -163,7 +177,7 @@ function OrderCard({ order, index }: { order: Order; index: number }) {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  {order.status === 'completed' && (
+                  {order.status === "completed" && (
                     <Button
                       variant="outline"
                       size="sm"
@@ -174,12 +188,13 @@ function OrderCard({ order, index }: { order: Order; index: number }) {
                       Book Again
                     </Button>
                   )}
-                  {order.status === 'confirmed' && (
+                  {order.status === "confirmed" && (
                     <Button variant="outline" size="sm">
                       Reschedule
                     </Button>
                   )}
-                  {(order.status === 'pending' || order.status === 'confirmed') && (
+                  {(order.status === "pending" ||
+                    order.status === "confirmed") && (
                     <Button variant="outline" size="sm" onClick={handleCancel}>
                       Cancel
                     </Button>
@@ -196,7 +211,7 @@ function OrderCard({ order, index }: { order: Order; index: number }) {
 
 export default function Orders() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState("all");
 
   const orders = useQuery(bookingsListMineRef, {});
 
@@ -207,8 +222,8 @@ export default function Orders() {
   };
 
   const allOrders = filterOrders();
-  const upcomingOrders = filterOrders('confirmed');
-  const completedOrders = filterOrders('completed');
+  const upcomingOrders = filterOrders("confirmed");
+  const completedOrders = filterOrders("completed");
 
   return (
     <Layout>
@@ -224,9 +239,7 @@ export default function Orders() {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
           <TabsList className="grid w-full max-w-md grid-cols-3">
-            <TabsTrigger value="all">
-              All ({allOrders.length})
-            </TabsTrigger>
+            <TabsTrigger value="all">All ({allOrders.length})</TabsTrigger>
             <TabsTrigger value="upcoming">
               Upcoming ({upcomingOrders.length})
             </TabsTrigger>
@@ -248,8 +261,8 @@ export default function Orders() {
                 title="No orders yet"
                 description="Start booking services to see your orders here."
                 action={{
-                  label: 'Browse Services',
-                  onClick: () => navigate('/services'),
+                  label: "Browse Services",
+                  onClick: () => navigate("/services"),
                 }}
               />
             )}
@@ -268,8 +281,8 @@ export default function Orders() {
                 title="No upcoming bookings"
                 description="Book a service to see your upcoming appointments here."
                 action={{
-                  label: 'Browse Services',
-                  onClick: () => navigate('/services'),
+                  label: "Browse Services",
+                  onClick: () => navigate("/services"),
                 }}
               />
             )}
@@ -288,8 +301,8 @@ export default function Orders() {
                 title="No completed orders"
                 description="Your completed service history will appear here."
                 action={{
-                  label: 'Browse Services',
-                  onClick: () => navigate('/services'),
+                  label: "Browse Services",
+                  onClick: () => navigate("/services"),
                 }}
               />
             )}

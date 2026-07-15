@@ -67,6 +67,11 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
 
   useEffect(() => {
     if (!authLoading && isAuthenticated && user !== undefined) {
+      // Admin takes priority over every other role
+      if (user?.role === ROLES.ADMIN) {
+        navigate("/admin");
+        return;
+      }
       if (user?.role === ROLES.PROFESSIONAL) {
         navigate("/pro");
         return;
