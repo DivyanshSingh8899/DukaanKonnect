@@ -12,8 +12,7 @@ const sendOtpEmailRef = makeFunctionReference<
 
 export const emailOtp = Email({
   id: "email-otp",
-  maxAge: 60 * 15, // 15 minutes
-  // This function can be asynchronous
+  maxAge: 60 * 15,
   async generateVerificationToken() {
     const random: RandomReader = {
       read(bytes: Uint8Array) {

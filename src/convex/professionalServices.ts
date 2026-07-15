@@ -94,7 +94,7 @@ export const listForService = query({
           const professional = await ctx.db.get(row.professionalId);
           if (!professional || !(professional.approved ?? false)) return null;
           return {
-            professional: toProfessional(professional),
+            professional: toProfessional(ctx, professional),
             price: row.price,
           };
         }),

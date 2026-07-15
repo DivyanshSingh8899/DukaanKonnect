@@ -58,17 +58,17 @@ export function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-shadow ${
+      className={`sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 transition-shadow ${
         scrolled ? 'shadow-sm' : ''
       }`}
     >
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto max-w-6xl px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              // whileHover={{ scale: 1.05 }}
+              // whileTap={{ scale: 0.95 }}
               className="flex items-center"
             >
               <div className="w-9 h-8 rounded-lg bg-primary flex items-center justify-center">
@@ -90,14 +90,14 @@ export function Header() {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate(item.path)}
-                className="relative"
+                className="relative rounded-full"
               >
-                <item.icon className="w-4 h-4 mr-2" />
+                <item.icon className="w-4 h-4" />
                 {item.label}
                 {item.label === 'Orders' && pendingCount > 0 && (
                   <Badge
                     variant="destructive"
-                    className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs"
+                    className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
                   >
                     {pendingCount}
                   </Badge>
@@ -113,6 +113,7 @@ export function Header() {
               variant="ghost"
               size="icon"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="rounded-full"
             >
               <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -125,7 +126,7 @@ export function Header() {
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate(isProfessional ? '/pro/profile' : '/profile')}
-                className="hidden md:flex"
+                className="hidden md:flex rounded-full"
               >
                 <Avatar className="w-8 h-8">
                   <AvatarImage src={user.image ?? undefined} alt={user.name ?? 'User'} />

@@ -22,6 +22,17 @@ export function CameraCapture({ onCapture }: CameraCaptureProps) {
 
   useEffect(() => stopCamera, []);
 
+  // Attach the stream to the video element once it's mounted and streaming.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (isStreaming && video && streamRef.current) {
+      video.srcObject = streamRef.current;
+      video.play().catch(() => {
+        setError('Could not start the camera preview. Please try again.');
+      });
+    }
+  }, [isStreaming]);
+
   const startCamera = async () => {
     setError(null);
     try {
@@ -29,10 +40,6 @@ export function CameraCapture({ onCapture }: CameraCaptureProps) {
         video: { facingMode: 'environment' },
       });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
       setIsStreaming(true);
     } catch {
       setError('Could not access the camera. Please allow camera permission and try again.');
@@ -43,6 +50,10 @@ export function CameraCapture({ onCapture }: CameraCaptureProps) {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
+    if (!video.videoWidth || !video.videoHeight) {
+      setError('Camera is still loading. Please wait a moment and try again.');
+      return;
+    }
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     const context = canvas.getContext('2d');
@@ -75,19 +86,26 @@ export function CameraCapture({ onCapture }: CameraCaptureProps) {
             Retake Photo
           </Button>
         </>
-      ) : isStreaming ? (
-        <>
-          <video ref={videoRef} className="w-full rounded-lg border bg-black" muted playsInline />
-          <Button type="button" className="w-full" onClick={capture}>
-            <Camera className="w-4 h-4 mr-2" />
-            Capture Photo
-          </Button>
-        </>
       ) : (
-        <Button type="button" variant="outline" className="w-full" onClick={startCamera}>
-          <Camera className="w-4 h-4 mr-2" />
-          Open Camera
-        </Button>
+        <>
+          <video
+            ref={videoRef}
+            className={`w-full rounded-lg border bg-black ${isStreaming ? '' : 'hidden'}`}
+            muted
+            playsInline
+          />
+          {isStreaming ? (
+            <Button type="button" className="w-full" onClick={capture}>
+              <Camera className="w-4 h-4 mr-2" />
+              Capture Photo
+            </Button>
+          ) : (
+            <Button type="button" variant="outline" className="w-full" onClick={startCamera}>
+              <Camera className="w-4 h-4 mr-2" />
+              Open Camera
+            </Button>
+          )}
+        </>
       )}
       {error && <p className="text-sm text-red-500">{error}</p>}
       <canvas ref={canvasRef} className="hidden" />

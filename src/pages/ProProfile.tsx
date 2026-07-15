@@ -46,6 +46,7 @@ function BecomeProfessional() {
   const registerAsProfessional = useMutation(registerAsProfessionalRef);
   const generateIdUploadUrl = useMutation(generateIdUploadUrlRef);
   const [selected, setSelected] = useState<string[]>([]);
+  const [fullName, setFullName] = useState('');
   const [bio, setBio] = useState('');
   const [experienceYears, setExperienceYears] = useState('');
   const [idDocumentType, setIdDocumentType] = useState<IdDocumentType | ''>('');
@@ -59,6 +60,10 @@ function BecomeProfessional() {
   };
 
   const handleSubmit = async () => {
+    if (!fullName.trim()) {
+      toast.error('Please enter your full name');
+      return;
+    }
     if (selected.length === 0) {
       toast.error('Please select at least one specialty');
       return;
@@ -86,6 +91,7 @@ function BecomeProfessional() {
       const { storageId } = await uploadResponse.json();
 
       await registerAsProfessional({
+        fullName: fullName.trim(),
         specialties: selected,
         bio: bio || undefined,
         experienceYears: Number(experienceYears),
@@ -126,6 +132,14 @@ function BecomeProfessional() {
             <CardTitle>Identity Verification</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Full Name</label>
+              <Input
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Your full name (as on your ID)"
+              />
+            </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">ID Document Type</label>
               <Select value={idDocumentType} onValueChange={(v) => setIdDocumentType(v as IdDocumentType)}>
@@ -294,7 +308,7 @@ function MyServicesAndPricing() {
                     value={priceDrafts[s.id] ?? ''}
                     onChange={(e) => setPriceDrafts({ ...priceDrafts, [s.id]: e.target.value })}
                   />
-                  <Button size="icon" className="h-8 w-8 flex-shrink-0" onClick={() => handleAdd(s.id)}>
+                  <Button size="icon" className="h-8 w-8 shrink-0" onClick={() => handleAdd(s.id)}>
                     <Plus className="w-4 h-4" />
                   </Button>
                 </div>
@@ -311,7 +325,7 @@ function MyServicesAndPricing() {
           )}
           {(myServices ?? []).map((row) => (
             <div key={row.id} className="flex items-center gap-3 p-3 rounded-lg border">
-              <img src={row.service.image} alt={row.service.name} className="w-12 h-12 rounded-md object-cover flex-shrink-0" />
+              <img src={row.service.image} alt={row.service.name} className="w-12 h-12 rounded-md object-cover shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{row.service.name}</p>
                 <p className="text-xs text-muted-foreground">{row.service.categoryName}</p>
@@ -328,7 +342,7 @@ function MyServicesAndPricing() {
               <Button
                 size="icon"
                 variant="ghost"
-                className="h-8 w-8 flex-shrink-0"
+                className="h-8 w-8 shrink-0"
                 onClick={() => handleUpdatePrice(row.id, row.service.id)}
               >
                 <Pencil className="w-4 h-4" />
@@ -336,7 +350,7 @@ function MyServicesAndPricing() {
               <Button
                 size="icon"
                 variant="ghost"
-                className="h-8 w-8 flex-shrink-0 text-destructive hover:text-destructive"
+                className="h-8 w-8 shrink-0 text-destructive hover:text-destructive"
                 onClick={() => handleRemove(row.id)}
               >
                 <Trash2 className="w-4 h-4" />
@@ -397,7 +411,7 @@ export default function ProProfile() {
         )}
 
         <Card className="overflow-hidden mb-6">
-          <div className="h-16 bg-gradient-to-r from-primary to-accent" />
+          <div className="h-16 bg-linear-to-r from-primary to-accent" />
           <CardContent className="pt-0">
             <div className="flex flex-col items-center text-center mb-6 -mt-10">
               <Avatar className="w-24 h-24 mb-4 border-4 border-background shadow-md">
@@ -411,7 +425,7 @@ export default function ProProfile() {
             </div>
 
             <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="text-center p-4 bg-gradient-to-br from-primary/5 to-accent/5 rounded-lg border">
+              <div className="text-center p-4 bg-linear-to-br from-primary/5 to-accent/5 rounded-lg border">
                 <div className="flex items-center justify-center gap-1 text-lg font-semibold">
                   <Star className="w-4 h-4 fill-primary text-primary" />
                   {myProfile.rating}
@@ -420,14 +434,14 @@ export default function ProProfile() {
                   {myProfile.reviewCount} reviews
                 </p>
               </div>
-              <div className="text-center p-4 bg-gradient-to-br from-primary/5 to-accent/5 rounded-lg border">
+              <div className="text-center p-4 bg-linear-to-br from-primary/5 to-accent/5 rounded-lg border">
                 <div className="flex items-center justify-center gap-1 text-lg font-semibold">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
                   {myProfile.completedJobs}
                 </div>
                 <p className="text-xs text-muted-foreground">Jobs completed</p>
               </div>
-              <div className="text-center p-4 bg-gradient-to-br from-primary/5 to-accent/5 rounded-lg border">
+              <div className="text-center p-4 bg-linear-to-br from-primary/5 to-accent/5 rounded-lg border">
                 <div className="text-lg font-semibold">{myProfile.experienceYears ?? 0}</div>
                 <p className="text-xs text-muted-foreground">Years experience</p>
               </div>

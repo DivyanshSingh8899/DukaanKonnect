@@ -1,12 +1,4 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   InputOTP,
@@ -20,17 +12,15 @@ import { useMutation } from "convex/react";
 import { ROLES } from "@/convex/schema";
 import {
   ArrowRight,
-  Briefcase,
-  Droplet,
+  BadgeCheck,
+  Clock,
   Loader2,
+  Lock,
   Mail,
-  Scissors,
   ShieldCheck,
-  Sparkles,
+  Star,
   User,
   UserX,
-  Wrench,
-  Zap,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Suspense, useEffect, useState } from "react";
@@ -40,19 +30,48 @@ interface AuthProps {
   redirectAfterAuth?: string;
 }
 
+const TRUST_POINTS = [
+  {
+    Icon: BadgeCheck,
+    title: "Verified professionals",
+    text: "Every provider is identity-checked and background-verified before they take a job.",
+  },
+  {
+    Icon: Clock,
+    title: "On-time, on demand",
+    text: "Book in minutes and track your professional from confirmation to doorstep.",
+  },
+  {
+    Icon: Lock,
+    title: "Secure payments",
+    text: "Payments are held in escrow and released only after the job is done.",
+  },
+  {
+    Icon: Star,
+    title: "Trust-score ranking",
+    text: "Providers are ranked by real service quality, never by paid placement.",
+  },
+];
+
 function Auth({ redirectAfterAuth }: AuthProps = {}) {
   const { isLoading: authLoading, isAuthenticated, user, signIn } = useAuth();
   const updateProfile = useMutation(updateProfileRef);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [loginMode, setLoginMode] = useState<"customer" | "provider">("customer");
-  const [step, setStep] = useState<"signIn" | { email: string; name: string }>("signIn");
+  const [step, setStep] = useState<"signIn" | { email: string; name: string }>(
+    "signIn",
+  );
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && isAuthenticated && user !== undefined) {
+      // Admin takes priority over every other role
+      if (user?.role === ROLES.ADMIN) {
+        navigate("/admin");
+        return;
+      }
       if (user?.role === ROLES.PROFESSIONAL) {
         navigate("/pro");
         return;
@@ -60,7 +79,15 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
       const redirect = searchParams.get("redirect") || redirectAfterAuth || "/";
       navigate(redirect);
     }
-  }, [authLoading, isAuthenticated, user, navigate, redirectAfterAuth, searchParams]);
+  }, [
+    authLoading,
+    isAuthenticated,
+    user,
+    navigate,
+    redirectAfterAuth,
+    searchParams,
+  ]);
+
   const handleEmailSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
@@ -89,24 +116,22 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
     try {
       const formData = new FormData(event.currentTarget);
       await signIn("email-otp", formData);
-
+      // signIn succeeded → OTP was correct.
+      // Update the profile, but don't treat its failure as a bad OTP.
       if (step !== "signIn" && step.name) {
-        await updateProfile({ name: step.name });
+        try {
+          await updateProfile({ name: step.name });
+        } catch (profileErr) {
+          console.error("Profile update failed (non-fatal):", profileErr);
+        }
       }
-
-      if (loginMode === "provider") {
-        navigate("/pro/profile");
-        return;
-      }
-
-      const redirect = redirectAfterAuth || "/";
-      navigate(redirect);
+      // Do NOT navigate here — the useEffect handles redirect
+      // once isAuthenticated flips. Leave isLoading true so the
+      // spinner stays until the redirect completes.
     } catch (error) {
       console.error("OTP verification error:", error);
-
       setError("The verification code you entered is incorrect.");
       setIsLoading(false);
-
       setOtp("");
     }
   };
@@ -123,384 +148,388 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
     } catch (error) {
       console.error("Guest login error:", error);
       console.error("Error details:", JSON.stringify(error, null, 2));
-      setError(`Failed to sign in as guest: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setError(
+        `Failed to sign in as guest: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
       setIsLoading(false);
     }
   };
 
-  const floatingIcons = [
-    { Icon: Wrench, className: "top-[12%] left-[10%]", delay: 0 },
-    { Icon: Sparkles, className: "top-[20%] right-[12%]", delay: 1.2 },
-    { Icon: Zap, className: "bottom-[18%] left-[14%]", delay: 2.4 },
-    { Icon: Droplet, className: "bottom-[24%] right-[9%]", delay: 0.8 },
-  ];
-
-  const showcaseServices = [
-    { Icon: Sparkles, label: "Home Cleaning", color: "text-blue-500", bg: "bg-blue-500/10" },
-    { Icon: Droplet, label: "Plumbing", color: "text-cyan-500", bg: "bg-cyan-500/10" },
-    { Icon: Zap, label: "Electrical", color: "text-yellow-500", bg: "bg-yellow-500/10" },
-    { Icon: Scissors, label: "Salon & Spa", color: "text-pink-500", bg: "bg-pink-500/10" },
-  ];
-  const [showcaseIndex, setShowcaseIndex] = useState(0);
-  useEffect(() => {
-    const interval = setInterval(
-      () => setShowcaseIndex((i) => (i + 1) % showcaseServices.length),
-      2500,
-    );
-    return () => clearInterval(interval);
-  }, [showcaseServices.length]);
-  const CurrentShowcase = showcaseServices[showcaseIndex];
-
   return (
-    <div className="relative min-h-screen flex flex-col overflow-hidden bg-gradient-to-br from-primary/5 via-accent/5 to-background">
-      {/* Animated decorative background */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <motion.div
-          animate={{ scale: [1, 1.15, 1], opacity: [0.25, 0.4, 0.25] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary/20 blur-3xl"
+    <div className="min-h-screen w-full bg-white text-slate-900 lg:grid lg:grid-cols-[minmax(0,44%)_minmax(0,56%)]">
+      {/* ============ LEFT — BRAND / TRUST PANEL (desktop) ============ */}
+      <aside className="relative hidden lg:flex flex-col justify-between overflow-hidden bg-[#0B1631] text-white">
+        {/* quiet geometric texture */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage:
+              "linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+          }}
         />
-        <motion.div
-          animate={{ scale: [1.15, 1, 1.15], opacity: [0.2, 0.35, 0.2] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -bottom-32 -right-16 w-[28rem] h-[28rem] rounded-full bg-accent/20 blur-3xl"
-        />
-        {floatingIcons.map(({ Icon, className, delay }, i) => (
-          <motion.div
-            key={i}
-            className={`absolute hidden sm:block ${className}`}
-            initial={{ opacity: 0, y: 0 }}
-            animate={{ opacity: [0, 0.25, 0], y: [-10, 10, -10] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay }}
-          >
-            <Icon className="w-10 h-10 text-primary" />
-          </motion.div>
-        ))}
-      </div>
+        <div className="pointer-events-none absolute -top-40 -right-40 h-96 w-96 rounded-full bg-blue-600/20 blur-3xl" />
 
-      {/* Auth Content */}
-      <div className="relative flex-1 flex items-center justify-center px-4 py-12">
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-20 max-w-5xl w-full">
-          {/* Brand showcase */}
-          <motion.div
-            initial={{ opacity: 0, x: -24 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="text-center lg:text-left max-w-md"
+        <div className="relative z-10 px-10 xl:px-14 pt-10">
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+            className="flex items-center gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded-md"
           >
-            <h1 className="text-4xl sm:text-5xl font-extrabold mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Dukaan Konnect
-            </h1>
-            <p className="text-muted-foreground text-base sm:text-lg mb-6">
-              Home services, on demand — book trusted professionals in
-              minutes.
-            </p>
+            <img
+              src="./logo.svg"
+              alt="DukaanKonnect logo"
+              width={40}
+              height={40}
+              className="rounded-md bg-white p-1"
+            />
+            <span className="text-lg font-semibold tracking-tight">
+              Dukaan<span className="text-blue-400">Konnect</span>
+            </span>
+          </button>
+        </div>
 
-            <div className="relative h-48 sm:h-56 w-full max-w-sm mx-auto lg:mx-0 rounded-2xl border bg-card/60 backdrop-blur-sm shadow-xl overflow-hidden">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={showcaseIndex}
-                  initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 1.05, y: -10 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="absolute inset-0 flex flex-col items-center justify-center gap-3"
-                >
-                  <div className={`w-16 h-16 rounded-2xl ${CurrentShowcase.bg} flex items-center justify-center`}>
-                    <CurrentShowcase.Icon className={`w-8 h-8 ${CurrentShowcase.color}`} />
-                  </div>
-                  <p className="font-semibold text-lg">{CurrentShowcase.label}</p>
-                </motion.div>
-              </AnimatePresence>
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-                {showcaseServices.map((_, i) => (
-                  <div
-                    key={i}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                      i === showcaseIndex ? "w-6 bg-primary" : "w-1.5 bg-muted-foreground/30"
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 24, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.45, ease: "easeOut" }}
-            className="flex items-center justify-center flex-col"
+        <div className="relative z-10 px-10 xl:px-14 py-12">
+          <motion.h1
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="text-3xl xl:text-4xl font-bold leading-tight tracking-tight"
           >
-          <Card className="min-w-[350px] pb-0 border shadow-2xl shadow-primary/10 backdrop-blur-sm bg-card/95">
+            Home services you can
+            <br />
+            actually trust.
+          </motion.h1>
+          <p className="mt-3 max-w-md text-sm xl:text-base text-slate-300">
+            Book verified professionals for cleaning, plumbing, electrical work
+            and more — with zero commission and transparent pricing.
+          </p>
+
+          <ul className="mt-10 space-y-6 max-w-md">
+            {TRUST_POINTS.map(({ Icon, title, text }, i) => (
+              <motion.li
+                key={title}
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.35, delay: 0.15 + i * 0.08 }}
+                className="flex items-start gap-4"
+              >
+                <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/15 ring-1 ring-inset ring-blue-400/30">
+                  <Icon className="h-[18px] w-[18px] text-blue-300" />
+                </span>
+                <span>
+                  <span className="block text-sm font-semibold text-white">
+                    {title}
+                  </span>
+                  <span className="mt-0.5 block text-sm text-slate-400">
+                    {text}
+                  </span>
+                </span>
+              </motion.li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="relative z-10 border-t border-white/10 px-10 xl:px-14 py-5">
+          <p className="text-xs text-slate-400">
+            Zero commission · Escrow-protected payments · Masked phone numbers
+          </p>
+        </div>
+      </aside>
+
+      {/* ============ RIGHT — AUTH FORM ============ */}
+      <main className="flex min-h-screen flex-col">
+        {/* Mobile top bar */}
+        <header className="flex items-center gap-3 border-b border-slate-200 px-5 py-4 lg:hidden">
+          <img
+            src="./logo.svg"
+            alt="DukaanKonnect logo"
+            width={32}
+            height={32}
+            className="rounded-md cursor-pointer"
+            onClick={() => navigate("/")}
+          />
+          <span className="text-base font-semibold tracking-tight">
+            Dukaan<span className="text-blue-600">Konnect</span>
+          </span>
+        </header>
+
+        <div className="flex flex-1 items-center justify-center px-5 py-10 sm:px-8">
+          <div className="w-full max-w-[420px]">
             <AnimatePresence mode="wait">
               {step === "signIn" ? (
                 <motion.div
                   key="signin"
-                  initial={{ opacity: 0, x: -16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -16 }}
-                  transition={{ duration: 0.25 }}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <CardHeader className="text-center">
-                    <motion.div
-                      className="flex justify-center"
-                      whileHover={{ scale: 1.08, rotate: -3 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <img
-                        src="./logo.svg"
-                        alt="Lock Icon"
-                        width={64}
-                        height={64}
-                        className="rounded-lg mb-4 mt-4 cursor-pointer shadow-lg shadow-primary/20"
-                        onClick={() => navigate("/")}
-                      />
-                    </motion.div>
-                    <CardTitle className="text-xl">Get Started</CardTitle>
-                    <CardDescription>
-                      <AnimatePresence mode="wait">
-                        <motion.span
-                          key={loginMode}
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 4 }}
-                          transition={{ duration: 0.2 }}
-                          className="block"
-                        >
-                          {loginMode === "provider"
-                            ? "Sign up to offer your services and receive job requests"
-                            : "Enter your email to log in or sign up"}
-                        </motion.span>
-                      </AnimatePresence>
-                    </CardDescription>
-                  </CardHeader>
-
-                  <div className="px-6">
-                    <div className="relative grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
-                      <motion.div
-                        className="absolute inset-y-1 w-[calc(50%-4px)] rounded-md bg-background shadow-sm"
-                        animate={{ x: loginMode === "customer" ? "0%" : "calc(100% + 8px)" }}
-                        transition={{ type: "spring", stiffness: 400, damping: 32 }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setLoginMode("customer")}
-                        className={`relative z-10 flex items-center justify-center gap-1.5 rounded-md py-1.5 text-sm font-medium transition-colors ${
-                          loginMode === "customer" ? "text-foreground" : "text-muted-foreground"
-                        }`}
-                      >
-                        <User className="w-4 h-4" />
-                        Customer
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setLoginMode("provider")}
-                        className={`relative z-10 flex items-center justify-center gap-1.5 rounded-md py-1.5 text-sm font-medium transition-colors ${
-                          loginMode === "provider" ? "text-foreground" : "text-muted-foreground"
-                        }`}
-                      >
-                        <Briefcase className="w-4 h-4" />
-                        Service Provider
-                      </button>
-                    </div>
+                  {/* Heading */}
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+                      Welcome
+                    </h2>
+                    <p className="mt-1 text-sm text-slate-500">
+                      Sign in or create an account to get started.
+                    </p>
                   </div>
 
-                  <form onSubmit={handleEmailSubmit}>
-                    <CardContent>
-                      <div className="relative mb-3">
-                        <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  {/* Email form */}
+                  <form onSubmit={handleEmailSubmit} className="space-y-4">
+                    <div>
+                      <label
+                        htmlFor="auth-name"
+                        className="mb-1.5 block text-sm font-medium text-slate-700"
+                      >
+                        Full name
+                      </label>
+                      <div className="relative">
+                        <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                         <Input
+                          id="auth-name"
                           name="name"
-                          placeholder="Your full name"
+                          placeholder="Enter your full name"
                           type="text"
-                          className="pl-9 transition-shadow focus-visible:shadow-md focus-visible:shadow-primary/10"
+                          autoComplete="name"
+                          className="h-11 pl-9 border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-blue-500"
                           disabled={isLoading}
                           required
                         />
                       </div>
-                      <div className="relative flex items-center gap-2">
-                        <div className="relative flex-1">
-                          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            name="email"
-                            placeholder="name@example.com"
-                            type="email"
-                            className="pl-9 transition-shadow focus-visible:shadow-md focus-visible:shadow-primary/10"
-                            disabled={isLoading}
-                            required
-                          />
-                        </div>
-                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.92 }}>
-                          <Button type="submit" variant="outline" size="icon" disabled={isLoading}>
-                            {isLoading ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <ArrowRight className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </motion.div>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="auth-email"
+                        className="mb-1.5 block text-sm font-medium text-slate-700"
+                      >
+                        Email address
+                      </label>
+                      <div className="relative">
+                        <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                        <Input
+                          id="auth-email"
+                          name="email"
+                          placeholder="name@example.com"
+                          type="email"
+                          autoComplete="email"
+                          className="h-11 pl-9 border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:ring-blue-500"
+                          disabled={isLoading}
+                          required
+                        />
                       </div>
-                      {error && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-2 text-sm text-red-500"
-                        >
-                          {error}
-                        </motion.p>
+                      <p className="mt-1.5 text-xs text-slate-500">
+                        We'll email you a 6-digit verification code.
+                      </p>
+                    </div>
+
+                    {error && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        role="alert"
+                        className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+                      >
+                        {error}
+                      </motion.div>
+                    )}
+
+                    <Button
+                      type="submit"
+                      disabled={isLoading}
+                      className="h-11 w-full bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-500"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Sending code...
+                        </>
+                      ) : (
+                        <>
+                          Continue
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </>
                       )}
-
-                      <AnimatePresence>
-                        {loginMode === "customer" && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="mt-4 overflow-hidden"
-                          >
-                            <div className="relative">
-                              <div className="absolute inset-0 flex items-center">
-                                <span className="w-full border-t" />
-                              </div>
-                              <div className="relative flex justify-center text-xs uppercase">
-                                <span className="bg-background px-2 text-muted-foreground">
-                                  Or
-                                </span>
-                              </div>
-                            </div>
-
-                            <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                className="w-full mt-4"
-                                onClick={handleGuestLogin}
-                                disabled={isLoading}
-                              >
-                                <UserX className="mr-2 h-4 w-4" />
-                                Continue as Guest
-                              </Button>
-                            </motion.div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </CardContent>
+                    </Button>
                   </form>
+
+                  {/* Guest login */}
+                  <div className="relative my-6">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-slate-200" />
+                    </div>
+                    <div className="relative flex justify-center">
+                      <span className="bg-white px-3 text-xs uppercase tracking-wide text-slate-400">
+                        or
+                      </span>
+                    </div>
+                  </div>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleGuestLogin}
+                    disabled={isLoading}
+                    className="h-11 w-full border-slate-300 text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                  >
+                    <UserX className="mr-2 h-4 w-4" />
+                    Continue as guest
+                  </Button>
+
+                  <p className="mt-8 text-center text-xs leading-relaxed text-slate-400">
+                    By continuing, you agree to DukaanKonnect's{" "}
+                    <a
+                      href="/terms"
+                      className="font-medium text-slate-600 underline underline-offset-2 hover:text-blue-600"
+                    >
+                      Terms of Service
+                    </a>{" "}
+                    and{" "}
+                    <a
+                      href="/privacy"
+                      className="font-medium text-slate-600 underline underline-offset-2 hover:text-blue-600"
+                    >
+                      Privacy Policy
+                    </a>
+                    .
+                  </p>
                 </motion.div>
               ) : (
                 <motion.div
                   key="otp"
-                  initial={{ opacity: 0, x: 16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 16 }}
-                  transition={{ duration: 0.25 }}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <CardHeader className="text-center mt-4">
-                    <motion.div
-                      initial={{ scale: 0, rotate: -20 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 18 }}
-                      className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10"
-                    >
-                      <ShieldCheck className="h-6 w-6 text-primary" />
-                    </motion.div>
-                    <CardTitle>Check your email</CardTitle>
-                    <CardDescription>
-                      We've sent a code to {step.email}
-                    </CardDescription>
-                  </CardHeader>
-                  <form onSubmit={handleOtpSubmit}>
-                    <CardContent className="pb-4">
-                      <input type="hidden" name="email" value={step.email} />
-                      <input type="hidden" name="code" value={otp} />
+                  <div className="mb-8 text-center">
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 ring-1 ring-inset ring-blue-100">
+                      <ShieldCheck className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+                      Verify your email
+                    </h2>
+                    <p className="mt-1.5 text-sm text-slate-500">
+                      We've sent a 6-digit code to{" "}
+                      <span className="font-medium text-slate-900">
+                        {step.email}
+                      </span>
+                    </p>
+                  </div>
 
-                      <motion.div
-                        className="flex justify-center"
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                      >
-                        <InputOTP
-                          value={otp}
-                          onChange={setOtp}
-                          maxLength={6}
-                          disabled={isLoading}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" && otp.length === 6 && !isLoading) {
-                              // Find the closest form and submit it
-                              const form = (e.target as HTMLElement).closest("form");
-                              if (form) {
-                                form.requestSubmit();
-                              }
+                  <form onSubmit={handleOtpSubmit}>
+                    <input type="hidden" name="email" value={step.email} />
+                    <input type="hidden" name="code" value={otp} />
+
+                    <div className="flex justify-center">
+                      <InputOTP
+                        value={otp}
+                        onChange={setOtp}
+                        maxLength={6}
+                        disabled={isLoading}
+                        onKeyDown={(e) => {
+                          if (
+                            e.key === "Enter" &&
+                            otp.length === 6 &&
+                            !isLoading
+                          ) {
+                            const form = (e.target as HTMLElement).closest(
+                              "form",
+                            );
+                            if (form) {
+                              form.requestSubmit();
                             }
-                          }}
-                        >
-                          <InputOTPGroup>
-                            {Array.from({ length: 6 }).map((_, index) => (
-                              <InputOTPSlot key={index} index={index} />
-                            ))}
-                          </InputOTPGroup>
-                        </InputOTP>
+                          }
+                        }}
+                      >
+                        <InputOTPGroup className="gap-2">
+                          {Array.from({ length: 6 }).map((_, index) => (
+                            <InputOTPSlot
+                              key={index}
+                              index={index}
+                              className="h-12 w-11 rounded-md border border-slate-300 text-lg font-semibold first:rounded-l-md last:rounded-r-md data-[active=true]:border-blue-500 data-[active=true]:ring-2 data-[active=true]:ring-blue-500/30"
+                            />
+                          ))}
+                        </InputOTPGroup>
+                      </InputOTP>
+                    </div>
+
+                    {error && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        role="alert"
+                        className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-center text-sm text-red-700"
+                      >
+                        {error}
                       </motion.div>
-                      {error && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-2 text-sm text-red-500 text-center"
-                        >
-                          {error}
-                        </motion.p>
-                      )}
-                      <p className="text-sm text-muted-foreground text-center mt-4">
-                        Didn't receive a code?{" "}
-                        <Button
-                          variant="link"
-                          className="p-0 h-auto"
-                          onClick={() => setStep("signIn")}
-                        >
-                          Try again
-                        </Button>
-                      </p>
-                    </CardContent>
-                    <CardFooter className="flex-col gap-2">
-                      <motion.div className="w-full" whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}>
-                        <Button
-                          type="submit"
-                          className="w-full"
-                          disabled={isLoading || otp.length !== 6}
-                        >
-                          {isLoading ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              Verifying...
-                            </>
-                          ) : (
-                            <>
-                              Verify code
-                              <ArrowRight className="ml-2 h-4 w-4" />
-                            </>
-                          )}
-                        </Button>
-                      </motion.div>
+                    )}
+
+                    <p className="mt-5 text-center text-sm text-slate-500">
+                      Didn't receive the code?{" "}
+                      <Button
+                        variant="link"
+                        className="h-auto p-0 text-blue-600"
+                        onClick={() => setStep("signIn")}
+                      >
+                        Resend code
+                      </Button>
+                    </p>
+
+                    <div className="mt-6 space-y-3">
+                      <Button
+                        type="submit"
+                        disabled={isLoading || otp.length !== 6}
+                        className="h-11 w-full bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-500"
+                      >
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Verifying...
+                          </>
+                        ) : (
+                          <>
+                            Verify and continue
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </>
+                        )}
+                      </Button>
                       <Button
                         type="button"
                         variant="ghost"
                         onClick={() => setStep("signIn")}
                         disabled={isLoading}
-                        className="w-full"
+                        className="h-11 w-full text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                       >
-                        Use different email
+                        Use a different email
                       </Button>
-                    </CardFooter>
+                    </div>
                   </form>
                 </motion.div>
               )}
             </AnimatePresence>
-          </Card>
-          </motion.div>
+          </div>
         </div>
-      </div>
+
+        {/* Mobile trust strip */}
+        <footer className="border-t border-slate-200 px-5 py-4 lg:hidden">
+          <div className="flex items-center justify-center gap-5 text-xs text-slate-500">
+            <span className="flex items-center gap-1.5">
+              <BadgeCheck className="h-3.5 w-3.5 text-blue-600" />
+              Verified pros
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Lock className="h-3.5 w-3.5 text-blue-600" />
+              Secure payments
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Star className="h-3.5 w-3.5 text-blue-600" />
+              Trust-score ranked
+            </span>
+          </div>
+        </footer>
+      </main>
     </div>
   );
 }

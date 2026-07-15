@@ -7,6 +7,8 @@ export function useAuth() {
   const user = useQuery(currentUserRef, {});
   const { signIn, signOut } = useAuthActions();
 
+  console.log("AUTH DEBUG:", { isAuthenticated, user });
+
   // Derive isLoading directly from the dependencies instead of managing separate state
   const isLoading = isAuthLoading || user === undefined;
 

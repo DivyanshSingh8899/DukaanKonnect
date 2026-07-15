@@ -73,8 +73,8 @@ function StatCard({
 }) {
   return (
     <Card>
-      <CardContent className="p-5 flex items-center gap-4">
-        <div className="w-11 h-11 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+      <CardContent className="px-5 flex items-center gap-4">
+        <div className="w-11 h-11 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
           <Icon className="w-5 h-5 text-primary" />
         </div>
         <div>
@@ -132,7 +132,7 @@ function ProfessionalsTab() {
           <div className="space-y-3">
             {pending.map((p) => (
               <Card key={p.id}>
-                <CardContent className="p-4 flex items-center justify-between gap-4 flex-wrap">
+                <CardContent className="px-4 flex items-center justify-between gap-4 flex-wrap">
                   <div>
                     <p className="font-medium">{p.name}</p>
                     <p className="text-sm text-muted-foreground">{p.email}</p>
@@ -179,7 +179,7 @@ function ProfessionalsTab() {
           <div className="space-y-3">
             {approved.map((p) => (
               <Card key={p.id}>
-                <CardContent className="p-4 flex items-center justify-between gap-4 flex-wrap">
+                <CardContent className="px-4 flex items-center justify-between gap-4 flex-wrap">
                   <div>
                     <p className="font-medium">{p.name}</p>
                     <p className="text-sm text-muted-foreground">{p.email}</p>
@@ -440,7 +440,7 @@ function ServicesTab() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {(categories ?? []).map((c) => (
             <Card key={c.id}>
-              <CardContent className="p-4 flex items-center justify-between">
+              <CardContent className="px-4 flex items-center justify-between">
                 <div>
                   <p className="font-medium">{c.name}</p>
                   <p className="text-xs text-muted-foreground">{c.serviceCount} services</p>
@@ -546,7 +546,7 @@ function ServicesTab() {
         <div className="space-y-2">
           {(services ?? []).map((s) => (
             <Card key={s.id}>
-              <CardContent className="p-4 flex items-center justify-between gap-4">
+              <CardContent className="px-4 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 min-w-0">
                   <img src={s.image} alt={s.name} className="w-12 h-12 rounded-md object-cover flex-shrink-0" />
                   <div className="min-w-0">
@@ -594,9 +594,9 @@ export default function AdminDashboard() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto max-w-6xl px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Founder Dashboard</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">Admin Dashboard</h1>
           <p className="text-muted-foreground">
             Manage professionals, bookings, and services across the platform
           </p>

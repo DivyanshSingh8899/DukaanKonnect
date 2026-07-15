@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Service } from '@/types';
 import { useNavigate } from 'react-router';
+import { BookingCard } from './ui/card';
 
 interface ServiceCardProps {
   service: Service;
@@ -18,17 +19,17 @@ export function ServiceCard({ service, index = 0 }: ServiceCardProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.3 }}
-      whileHover={{ y: -4 }}
+      // transition={{ delay: index * 0.05, duration: 0.3 }}
+      // whileHover={{ y: -4 }}
     >
-      <Card className="overflow-hidden hover:shadow-lg transition-all cursor-pointer group">
-        <div className="relative h-44 overflow-hidden">
+      <BookingCard className="overflow-hidden transition-all cursor-pointer group">
+        <div className="relative h-45 overflow-hidden">
           <img
             src={service.image}
             alt={service.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/30 via-transparent to-transparent" />
           {service.featured && (
             <Badge className="absolute top-3 left-3 bg-accent">
               Featured
@@ -44,15 +45,15 @@ export function ServiceCard({ service, index = 0 }: ServiceCardProps) {
             </Badge>
           ))}
         </div>
-        <CardContent className="p-4">
-          <div className="flex items-start justify-between mb-2">
+        <CardContent className="px-4 pb-4">
+          <div className="flex items-start justify-between mb-3">
             <div className="flex-1">
-              <h3 className="font-semibold text-base mb-1 line-clamp-1">
-                {service.name}
-              </h3>
-              <p className="text-xs text-muted-foreground mb-2">
+              <p className="text-sm text-muted-foreground mb-0">
                 {service.categoryName}
               </p>
+              <h3 className="font-bold text-xl mb-0 line-clamp-1">
+                {service.name}
+              </h3>
             </div>
           </div>
 
@@ -60,7 +61,7 @@ export function ServiceCard({ service, index = 0 }: ServiceCardProps) {
             {service.description}
           </p>
 
-          <div className="flex items-center gap-3 mb-3 text-xs">
+          <div className="flex items-center gap-3 mb-3 text-sm">
             <div className="flex items-center gap-1">
               <Star className="w-3.5 h-3.5 fill-accent text-accent" />
               <span className="font-medium">{service.rating}</span>
@@ -76,21 +77,21 @@ export function ServiceCard({ service, index = 0 }: ServiceCardProps) {
 
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-xl font-bold text-primary">
+              <span className="text-2xl font-bold text-primary">
                 ₹{service.price}
               </span>
             </div>
             <Button
               size="sm"
               onClick={() => navigate(`/booking?service=${service.id}`)}
-              className="group/btn"
+              className="group/btn rounded-full"
             >
               Book Now
-              <ChevronRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
+              <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           </div>
         </CardContent>
-      </Card>
+      </BookingCard>
     </motion.div>
   );
 }

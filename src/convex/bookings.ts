@@ -109,7 +109,7 @@ export const listMine = query({
           return {
             id: b._id,
             service: toService(service),
-            professional: professional ? toProfessional(professional) : null,
+            professional: professional ? toProfessional(ctx, professional) : null,
             date: b.date,
             time: b.time,
             status: b.status,
