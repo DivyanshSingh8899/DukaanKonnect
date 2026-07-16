@@ -3,7 +3,7 @@ import { Anonymous } from "@convex-dev/auth/providers/Anonymous";
 import { emailOtp } from "./auth/emailOtp";
 import { ROLES } from "./schema";
 
-const ADMIN_EMAIL = "hellokrishahlawat@gmail.com";
+const ADMIN_EMAIL = "divyanshsinghds89@gmail.com";
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   providers: [emailOtp, Anonymous],
