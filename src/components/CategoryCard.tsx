@@ -43,10 +43,10 @@ export function CategoryCard({ category, index = 0 }: CategoryCardProps) {
       whileTap={{ scale: 0.98 }}
     >
       <Card
-        className="cursor-pointer hover:border-primary/40 group overflow-hidden"
+        className="cursor-pointer hover:border-primary/40 group overflow-hidden h-45"
         onClick={() => navigate(`/services?category=${category.slug}`)}
       >
-        <CardContent className="p-5 flex flex-col items-center text-center">
+        <CardContent className="px-5 flex flex-col items-center text-center">
           <div className="w-14 h-14 rounded-full bg-linear-to-br from-primary/10 to-accent/10 flex items-center justify-center mb-3 group-hover:from-primary/20 group-hover:to-accent/20 transition-colors">
             <Icon className="w-7 h-7 text-primary" />
           </div>
