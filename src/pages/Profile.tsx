@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState } from "react";
+import { motion } from "framer-motion";
 import {
   Mail,
   Phone,
@@ -14,16 +14,16 @@ import {
   Shield,
   HelpCircle,
   Briefcase,
-} from 'lucide-react';
-import { Layout } from '@/components/Layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
+} from "lucide-react";
+import { Layout } from "@/components/Layout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -31,14 +31,18 @@ import {
   DialogTitle,
   DialogFooter,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { useAuth } from '@/hooks/use-auth';
-import { useQuery, useMutation } from 'convex/react';
-import { addressesListMineRef, updateProfileRef, addAddressRef } from '@/lib/convexRefs';
-import { getInitials } from '@/lib/utils';
-import { ROLES } from '@/convex/schema';
-import { useNavigate } from 'react-router';
-import { toast } from 'sonner';
+} from "@/components/ui/dialog";
+import { useAuth } from "@/hooks/use-auth";
+import { useQuery, useMutation } from "convex/react";
+import {
+  addressesListMineRef,
+  updateProfileRef,
+  addAddressRef,
+} from "@/lib/convexRefs";
+import { getInitials } from "@/lib/utils";
+import { ROLES } from "@/convex/schema";
+import { useNavigate } from "react-router";
+import { toast } from "sonner";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -49,18 +53,18 @@ export default function Profile() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: user?.name || '',
-    phone: user?.phone || '',
-    address: user?.address || '',
+    name: user?.name || "",
+    phone: user?.phone || "",
+    address: user?.address || "",
   });
 
   const [addressDialogOpen, setAddressDialogOpen] = useState(false);
   const [addressForm, setAddressForm] = useState({
-    label: '',
-    address: '',
-    city: '',
-    state: '',
-    pincode: '',
+    label: "",
+    address: "",
+    city: "",
+    state: "",
+    pincode: "",
   });
 
   const [notifications, setNotifications] = useState({
@@ -71,9 +75,9 @@ export default function Profile() {
 
   const handleEditStart = () => {
     setFormData({
-      name: user?.name || '',
-      phone: user?.phone || '',
-      address: user?.address || '',
+      name: user?.name || "",
+      phone: user?.phone || "",
+      address: user?.address || "",
     });
     setIsEditing(true);
   };
@@ -82,9 +86,11 @@ export default function Profile() {
     try {
       await updateProfile(formData);
       setIsEditing(false);
-      toast.success('Profile updated successfully!');
+      toast.success("Profile updated successfully!");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to update profile');
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update profile",
+      );
     }
   };
 
@@ -95,16 +101,16 @@ export default function Profile() {
   const handleLogout = async () => {
     try {
       await signOut();
-      navigate('/auth');
-      toast.success('Logged out successfully');
+      navigate("/auth");
+      toast.success("Logged out successfully");
     } catch {
-      toast.error('Failed to log out');
+      toast.error("Failed to log out");
     }
   };
 
   const handleAddAddress = async () => {
     if (!addressForm.label || !addressForm.address || !addressForm.city) {
-      toast.error('Please fill in all required fields');
+      toast.error("Please fill in all required fields");
       return;
     }
     try {
@@ -112,11 +118,19 @@ export default function Profile() {
         ...addressForm,
         isDefault: (addresses?.length ?? 0) === 0,
       });
-      setAddressForm({ label: '', address: '', city: '', state: '', pincode: '' });
+      setAddressForm({
+        label: "",
+        address: "",
+        city: "",
+        state: "",
+        pincode: "",
+      });
       setAddressDialogOpen(false);
-      toast.success('Address added');
+      toast.success("Address added");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to add address');
+      toast.error(
+        error instanceof Error ? error.message : "Failed to add address",
+      );
     }
   };
 
@@ -125,34 +139,40 @@ export default function Profile() {
   const settingsItems = [
     {
       icon: CreditCard,
-      label: 'Payment Methods',
-      description: 'Manage your cards and payment options',
+      label: "Payment Methods",
+      description: "Manage your cards and payment options",
     },
     {
       icon: Shield,
-      label: 'Privacy & Security',
-      description: 'Control your privacy settings',
+      label: "Privacy & Security",
+      description: "Control your privacy settings",
     },
     {
       icon: HelpCircle,
-      label: 'Help & Support',
-      description: 'Get help with your account',
+      label: "Help & Support",
+      description: "Get help with your account",
     },
   ];
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            My Profile
-          </h1>
+      {/* Header */}
+      <div
+        className="relative bg-muted/30 border-b"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, var(--border) 1px, transparent 1px)",
+          backgroundSize: "20px 20px",
+        }}
+      >
+        <div className="container mx-auto max-w-6xl px-4 py-10">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">My Profile</h1>
           <p className="text-muted-foreground">
             Manage your account information and preferences
           </p>
         </div>
-
+      </div>
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Profile Card */}
           <div className="lg:col-span-1">
@@ -167,13 +187,13 @@ export default function Profile() {
                     </AvatarFallback>
                   </Avatar>
                   <h3 className="text-xl font-semibold mb-1">
-                    {user?.name || 'Guest'}
+                    {user?.name || "Guest"}
                   </h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    {user?.email || 'No email'}
+                    {user?.email || "No email"}
                   </p>
                   <Badge variant="secondary" className="mb-4">
-                    {isProfessional ? 'Professional' : 'Member'}
+                    {isProfessional ? "Professional" : "Member"}
                   </Badge>
                   <Button
                     variant="outline"
@@ -191,15 +211,15 @@ export default function Profile() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-sm">
                     <Mail className="w-4 h-4 text-muted-foreground" />
-                    <span className="truncate">{user?.email || 'Not set'}</span>
+                    <span className="truncate">{user?.email || "Not set"}</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Phone className="w-4 h-4 text-muted-foreground" />
-                    <span>{user?.phone || 'Not set'}</span>
+                    <span>{user?.phone || "Not set"}</span>
                   </div>
                   <div className="flex items-start gap-3 text-sm">
                     <MapPin className="w-4 h-4 text-muted-foreground mt-0.5" />
-                    <span className="flex-1">{user?.address || 'Not set'}</span>
+                    <span className="flex-1">{user?.address || "Not set"}</span>
                   </div>
                 </div>
 
@@ -287,7 +307,10 @@ export default function Profile() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Saved Addresses</CardTitle>
-                  <Dialog open={addressDialogOpen} onOpenChange={setAddressDialogOpen}>
+                  <Dialog
+                    open={addressDialogOpen}
+                    onOpenChange={setAddressDialogOpen}
+                  >
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm">
                         <MapPin className="w-4 h-4 mr-2" />
@@ -302,29 +325,54 @@ export default function Profile() {
                         <Input
                           placeholder="Label (e.g. Home, Office)"
                           value={addressForm.label}
-                          onChange={(e) => setAddressForm({ ...addressForm, label: e.target.value })}
+                          onChange={(e) =>
+                            setAddressForm({
+                              ...addressForm,
+                              label: e.target.value,
+                            })
+                          }
                         />
                         <Input
                           placeholder="Street Address"
                           value={addressForm.address}
-                          onChange={(e) => setAddressForm({ ...addressForm, address: e.target.value })}
+                          onChange={(e) =>
+                            setAddressForm({
+                              ...addressForm,
+                              address: e.target.value,
+                            })
+                          }
                         />
                         <div className="grid grid-cols-2 gap-3">
                           <Input
                             placeholder="City"
                             value={addressForm.city}
-                            onChange={(e) => setAddressForm({ ...addressForm, city: e.target.value })}
+                            onChange={(e) =>
+                              setAddressForm({
+                                ...addressForm,
+                                city: e.target.value,
+                              })
+                            }
                           />
                           <Input
                             placeholder="State"
                             value={addressForm.state}
-                            onChange={(e) => setAddressForm({ ...addressForm, state: e.target.value })}
+                            onChange={(e) =>
+                              setAddressForm({
+                                ...addressForm,
+                                state: e.target.value,
+                              })
+                            }
                           />
                         </div>
                         <Input
                           placeholder="Pincode"
                           value={addressForm.pincode}
-                          onChange={(e) => setAddressForm({ ...addressForm, pincode: e.target.value })}
+                          onChange={(e) =>
+                            setAddressForm({
+                              ...addressForm,
+                              pincode: e.target.value,
+                            })
+                          }
                         />
                       </div>
                       <DialogFooter>
@@ -336,7 +384,9 @@ export default function Profile() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {(addresses ?? []).length === 0 && (
-                  <p className="text-sm text-muted-foreground">No saved addresses yet.</p>
+                  <p className="text-sm text-muted-foreground">
+                    No saved addresses yet.
+                  </p>
                 )}
                 {(addresses ?? []).map((addr) => (
                   <Card key={addr.id} className="p-4">
@@ -447,11 +497,13 @@ export default function Profile() {
                   <Button
                     variant="ghost"
                     className="w-full justify-start h-auto p-4"
-                    onClick={() => navigate('/pro/profile')}
+                    onClick={() => navigate("/pro/profile")}
                   >
                     <Briefcase className="w-5 h-5 mr-3 text-muted-foreground" />
                     <div className="text-left">
-                      <p className="font-medium">Become a Service Professional</p>
+                      <p className="font-medium">
+                        Become a Service Professional
+                      </p>
                       <p className="text-sm text-muted-foreground">
                         Offer your services and manage job requests
                       </p>

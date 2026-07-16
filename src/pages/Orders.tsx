@@ -96,7 +96,7 @@ function OrderCard({ order, index }: { order: Order; index: number }) {
         <CardContent className="p-0">
           <div className="flex flex-col md:flex-row gap-4 p-6">
             {/* Service Image */}
-            <div className="w-full md:w-32 h-32 rounded-lg overflow-hidden flex-shrink-0">
+            <div className="w-full md:w-32 h-32 rounded-lg overflow-hidden shrink-0">
               <img
                 src={order.service.image}
                 alt={order.service.name}
@@ -227,15 +227,23 @@ export default function Orders() {
 
   return (
     <Layout>
-      <div className="container mx-auto max-w-6xl px-4 py-10">
-        {/* Header */}
-        <div className="mb-8">
+      {/* Header */}
+      <div
+        className="relative bg-muted/30 border-b"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, var(--border) 1px, transparent 1px)",
+          backgroundSize: "20px 20px",
+        }}
+      >
+        <div className="container mx-auto max-w-6xl px-4 py-10">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">My Orders</h1>
           <p className="text-muted-foreground">
             Track and manage your service bookings
           </p>
         </div>
-
+      </div>
+      <div className="container mx-auto max-w-6xl px-4 py-10">
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
           <TabsList className="grid w-full max-w-md grid-cols-3">
