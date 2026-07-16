@@ -20,6 +20,10 @@ const AuthPage = lazy(() => import("./pages/Auth.tsx"));
 const ProDashboard = lazy(() => import("./pages/ProDashboard.tsx"));
 const ProProfile = lazy(() => import("./pages/ProProfile.tsx"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard.tsx"));
+const EmergencyServices = lazy(() => import("./pages/EmergencyServices.tsx"));
+const Contact = lazy(() => import("./pages/Contact.tsx"));
+const Privacy = lazy(() => import("./pages/Privacy.tsx"));
+const Terms = lazy(() => import("./pages/Terms.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 // Simple loading fallback for route transitions
@@ -94,6 +98,10 @@ createRoot(document.getElementById("root")!).render(
                   }
                 />
                 <Route path="/auth" element={<AuthPage />} />
+                <Route path="/emergency" element={<EmergencyServices />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

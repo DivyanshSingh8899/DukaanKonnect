@@ -1,6 +1,8 @@
 import { ReactNode } from 'react';
+import { Link } from 'react-router';
 import { Header } from './Header';
 import { ChatWidget } from './ChatWidget';
+import { EmergencyButton } from './EmergencyButton';
 import { motion } from 'framer-motion';
 import { Facebook, Instagram, Twitter } from 'lucide-react';
 
@@ -22,6 +24,7 @@ export function Layout({ children }: LayoutProps) {
         {children}
       </motion.main>
       <ChatWidget />
+      <EmergencyButton />
       <footer className="relative overflow-hidden border-t border-white/10 bg-[#0B1631] text-white py-12 mt-auto">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.05]"
@@ -75,26 +78,71 @@ export function Layout({ children }: LayoutProps) {
             <div>
               <h3 className="font-semibold mb-3 text-white">Services</h3>
               <ul className="text-sm text-slate-400 space-y-2">
-                <li>Cleaning</li>
-                <li>Plumbing</li>
-                <li>Electrical</li>
-                <li>Salon & Spa</li>
+                <li>
+                  <Link to="/services?category=cleaning" className="hover:text-white transition-colors">
+                    Cleaning
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/services?category=plumbing" className="hover:text-white transition-colors">
+                    Plumbing
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/services?category=electrical" className="hover:text-white transition-colors">
+                    Electrical
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/services?category=salon-spa" className="hover:text-white transition-colors">
+                    Salon & Spa
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-3 text-white">Support</h3>
               <ul className="text-sm text-slate-400 space-y-2">
-                <li>Help Center</li>
-                <li>Contact Us</li>
-                <li>Terms of Service</li>
-                <li>Privacy Policy</li>
+                <li>
+                  <Link to="/contact" className="hover:text-white transition-colors">
+                    Help Center
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/contact" className="hover:text-white transition-colors">
+                    Contact Us
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/terms" className="hover:text-white transition-colors">
+                    Terms of Service
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/privacy" className="hover:text-white transition-colors">
+                    Privacy Policy
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold mb-3 text-white">Contact</h3>
               <ul className="text-sm text-slate-400 space-y-2">
-                <li>Email: support.dukaankonnect@gmail.com</li>
-                <li>Phone: +91 9115224050</li>
+                <li>
+                  Email:{' '}
+                  <a
+                    href="mailto:support.dukaankonnect@gmail.com"
+                    className="hover:text-white transition-colors"
+                  >
+                    support.dukaankonnect@gmail.com
+                  </a>
+                </li>
+                <li>
+                  Phone:{' '}
+                  <a href="tel:+919115224050" className="hover:text-white transition-colors">
+                    +91 9115224050
+                  </a>
+                </li>
                 <li>Available 24/7</li>
               </ul>
             </div>
