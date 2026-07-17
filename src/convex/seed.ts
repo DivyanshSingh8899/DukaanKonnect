@@ -1,5 +1,6 @@
 import { mutation } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
+import { ROLES } from "./schema";
 
 const categoriesData = [
   { name: "Cleaning", slug: "cleaning", icon: "Sparkles", description: "Professional home cleaning services", serviceCount: 3 },
@@ -55,5 +56,84 @@ export const seed = mutation({
     }
 
     return { skipped: false, categories: categoriesData.length, services: servicesData.length };
+  },
+});
+
+const professionalsData = [
+  {
+    name: "Rajesh Kumar",
+    email: "rajesh.kumar@dukaankonnect.pro",
+    specialties: ["plumbing"],
+    bio: "Licensed plumber with over a decade of experience fixing leaks, installations, and drainage issues across residential homes.",
+    experienceYears: 11,
+    rating: 4.8,
+    reviewCount: 312,
+    completedJobs: 480,
+  },
+  {
+    name: "Priya Sharma",
+    email: "priya.sharma@dukaankonnect.pro",
+    specialties: ["cleaning"],
+    bio: "Detail-oriented cleaning specialist known for thorough deep cleans using eco-friendly products.",
+    experienceYears: 6,
+    rating: 4.9,
+    reviewCount: 528,
+    completedJobs: 710,
+  },
+  {
+    name: "Amit Verma",
+    email: "amit.verma@dukaankonnect.pro",
+    specialties: ["electrical"],
+    bio: "Certified electrician specializing in wiring, installations, and safe emergency repairs.",
+    experienceYears: 8,
+    rating: 4.7,
+    reviewCount: 245,
+    completedJobs: 390,
+  },
+  {
+    name: "Sunita Reddy",
+    email: "sunita.reddy@dukaankonnect.pro",
+    specialties: ["salon-spa"],
+    bio: "Professional beautician offering haircuts, styling, and facials in the comfort of your home.",
+    experienceYears: 9,
+    rating: 4.9,
+    reviewCount: 601,
+    completedJobs: 820,
+  },
+];
+
+export const seedProfessionals = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const existing = await ctx.db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", professionalsData[0].email))
+      .unique();
+    if (existing) {
+      return { skipped: true, reason: "professionals already seeded" };
+    }
+
+    for (const pro of professionalsData) {
+      const userId = await ctx.db.insert("users", {
+        name: pro.name,
+        email: pro.email,
+        role: ROLES.PROFESSIONAL,
+      });
+
+      await ctx.db.insert("professionals", {
+        userId,
+        name: pro.name,
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(pro.email)}`,
+        rating: pro.rating,
+        reviewCount: pro.reviewCount,
+        completedJobs: pro.completedJobs,
+        specialties: pro.specialties,
+        bio: pro.bio,
+        experienceYears: pro.experienceYears,
+        approved: true,
+      });
+    }
+
+    return { skipped: false, professionals: professionalsData.length };
   },
 });
