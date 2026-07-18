@@ -1,9 +1,16 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
+import { makeFunctionReference } from "convex/server";
 import { mutation, query } from "./_generated/server";
 import { orderStatusValidator } from "./schema";
 import { toService } from "./services";
 import { toProfessional } from "./professionals";
+
+const sendStatusEmailRef = makeFunctionReference<
+  "action",
+  { email: string; serviceName: string; date: string; time: string; status: string },
+  void
+>("bookingNotifications:sendStatusEmail");
 
 export const create = mutation({
   args: {
@@ -210,8 +217,24 @@ export const updateStatus = mutation({
     const isMine = booking.professionalId === myProfessional._id;
     if (!isMine) throw new Error("Not authorized");
 
+    const notifyCustomer = async (status: string) => {
+      const [customer, service] = await Promise.all([
+        ctx.db.get(booking.userId),
+        ctx.db.get(booking.serviceId),
+      ]);
+      if (!customer?.email || !service) return;
+      await ctx.scheduler.runAfter(0, sendStatusEmailRef, {
+        email: customer.email,
+        serviceName: service.name,
+        date: booking.date,
+        time: booking.time,
+        status,
+      });
+    };
+
     if (args.status === "confirmed" && booking.status === "pending") {
       await ctx.db.patch(args.bookingId, { status: "confirmed" });
+      await notifyCustomer("confirmed");
       return;
     }
 
@@ -220,11 +243,13 @@ export const updateStatus = mutation({
       (booking.status === "pending" || booking.status === "confirmed")
     ) {
       await ctx.db.patch(args.bookingId, { status: "cancelled" });
+      await notifyCustomer("cancelled");
       return;
     }
 
     if (args.status === "in_progress" && booking.status === "confirmed") {
       await ctx.db.patch(args.bookingId, { status: "in_progress" });
+      await notifyCustomer("in_progress");
       return;
     }
 
@@ -233,6 +258,7 @@ export const updateStatus = mutation({
       await ctx.db.patch(myProfessional._id, {
         completedJobs: myProfessional.completedJobs + 1,
       });
+      await notifyCustomer("completed");
       return;
     }
 
