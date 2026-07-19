@@ -231,6 +231,12 @@ export const chatSendMessageRef = makeFunctionReference<
   void
 >("chatActions:sendMessage");
 
+export const transcribeAudioRef = makeFunctionReference<
+  "action",
+  { audio: ArrayBuffer; mimeType: string },
+  { transcript: string }
+>("speechActions:transcribe");
+
 export const categoriesCreateRef = makeFunctionReference<
   "mutation",
   { name: string; slug: string; icon: string; description: string },

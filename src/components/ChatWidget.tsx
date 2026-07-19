@@ -1,22 +1,33 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { MessageCircle, Send, X, Loader2 } from 'lucide-react';
+import { MessageCircle, Send, X, Loader2, Mic, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/hooks/use-auth';
 import { useQuery, useAction } from 'convex/react';
-import { chatListMineRef, chatSendMessageRef } from '@/lib/convexRefs';
+import { chatListMineRef, chatSendMessageRef, transcribeAudioRef } from '@/lib/convexRefs';
 import { toast } from 'sonner';
+
+const RECORDER_MIME_TYPE = [
+  'audio/webm',
+  'audio/ogg',
+  'audio/mp4',
+].find((type) => typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(type));
 
 export function ChatWidget() {
   const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   const messages = useQuery(chatListMineRef, isAuthenticated ? {} : 'skip');
   const sendMessage = useAction(chatSendMessageRef);
+  const transcribeAudio = useAction(transcribeAudioRef);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -36,6 +47,50 @@ export function ChatWidget() {
     } finally {
       setIsSending(false);
     }
+  };
+
+  const startRecording = async () => {
+    if (!RECORDER_MIME_TYPE) {
+      toast.error('Voice input is not supported in this browser.');
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream, { mimeType: RECORDER_MIME_TYPE });
+      audioChunksRef.current = [];
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((track) => track.stop());
+        const blob = new Blob(audioChunksRef.current, { type: RECORDER_MIME_TYPE });
+        if (blob.size === 0) return;
+        setIsTranscribing(true);
+        try {
+          const audio = await blob.arrayBuffer();
+          const { transcript } = await transcribeAudio({ audio, mimeType: RECORDER_MIME_TYPE });
+          if (transcript) {
+            setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
+          } else {
+            toast.error("Couldn't understand that. Please try again.");
+          }
+        } catch (error) {
+          toast.error(error instanceof Error ? error.message : 'Failed to transcribe audio');
+        } finally {
+          setIsTranscribing(false);
+        }
+      };
+      mediaRecorderRef.current = recorder;
+      recorder.start();
+      setIsRecording(true);
+    } catch {
+      toast.error('Microphone access was denied.');
+    }
+  };
+
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop();
+    setIsRecording(false);
   };
 
   return (
@@ -112,11 +167,27 @@ export function ChatWidget() {
                     handleSend();
                   }
                 }}
-                placeholder="Type your message..."
+                placeholder={isRecording ? 'Listening...' : isTranscribing ? 'Transcribing...' : 'Type your message...'}
                 rows={1}
                 className="min-h-9 max-h-24 resize-none text-sm"
-                disabled={isSending}
+                disabled={isSending || isTranscribing}
               />
+              <Button
+                type="button"
+                size="icon"
+                variant={isRecording ? 'destructive' : 'outline'}
+                onClick={isRecording ? stopRecording : startRecording}
+                disabled={isSending || isTranscribing}
+                title={isRecording ? 'Stop recording' : 'Record a voice message'}
+              >
+                {isTranscribing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : isRecording ? (
+                  <Square className="w-4 h-4" />
+                ) : (
+                  <Mic className="w-4 h-4" />
+                )}
+              </Button>
               <Button size="icon" onClick={handleSend} disabled={isSending || !input.trim()}>
                 <Send className="w-4 h-4" />
               </Button>

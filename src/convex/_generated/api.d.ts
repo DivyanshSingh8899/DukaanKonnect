@@ -14,6 +14,7 @@ import type * as adminAuth from "../adminAuth.js";
 import type * as auth from "../auth.js";
 import type * as auth_emailOtp from "../auth/emailOtp.js";
 import type * as auth_sendOtpEmail from "../auth/sendOtpEmail.js";
+import type * as bookingNotifications from "../bookingNotifications.js";
 import type * as bookings from "../bookings.js";
 import type * as categories from "../categories.js";
 import type * as chat from "../chat.js";
@@ -25,6 +26,7 @@ import type * as professionals from "../professionals.js";
 import type * as razorpay from "../razorpay.js";
 import type * as seed from "../seed.js";
 import type * as services from "../services.js";
+import type * as speechActions from "../speechActions.js";
 import type * as users from "../users.js";
 
 import type {
@@ -40,6 +42,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   "auth/emailOtp": typeof auth_emailOtp;
   "auth/sendOtpEmail": typeof auth_sendOtpEmail;
+  bookingNotifications: typeof bookingNotifications;
   bookings: typeof bookings;
   categories: typeof categories;
   chat: typeof chat;
@@ -51,6 +54,7 @@ declare const fullApi: ApiFromModules<{
   razorpay: typeof razorpay;
   seed: typeof seed;
   services: typeof services;
+  speechActions: typeof speechActions;
   users: typeof users;
 }>;
 
